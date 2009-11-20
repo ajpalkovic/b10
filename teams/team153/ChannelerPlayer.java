@@ -12,36 +12,38 @@ public class ChannelerPlayer extends AttackPlayer {
     }
 
     public void run() {
-        myTeam = controller.getTeam();
+        team = controller.getTeam();
 
-        while(true) {
+        while (true) {
             int startTurn = Clock.getRoundNum();
             controller.setIndicatorString(0, controller.getLocation().toString());
-            parseMessages();
-            if(isEnergonLow()) {
-                while(!isEnergonFull()) {
-                    requestEnergonTransfer();
+            messaging.parseMessages();
+            if (energon.isEnergonLow()) {
+                while (!energon.isEnergonFull()) {
+                    energon.requestEnergonTransfer();
                     controller.yield();
                 }
                 continue;
             }
-            
+
             processEnemies();
-            if(enemies.size() > 0) {
+            if (enemies.size() > 0) {
                 sortEnemies();
-                if(inRangeEnemies.size() == 0 && outOfRangeEnemies.size() > 0 && controller.getRoundsUntilMovementIdle() == 0 && getDistanceToNearestArchon() <= maxDistanceAway) {
+                if (inRangeEnemies.size() == 0 && outOfRangeEnemies.size() > 0 && controller.getRoundsUntilMovementIdle() == 0 && navigation.getDistanceToNearestArchon() <= maxDistanceAway) {
                     EnemyInfo closest = getCheapestEnemy(outOfRangeEnemies);
                     movingToAttack = true;
-                    moveOnceTowardsLocation(closest.location);
+                    navigation.moveOnceTowardsLocation(closest.location);
                     movingToAttack = false;
                 }
                 try {
                     controller.drain();
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
 
-            if(startTurn == Clock.getRoundNum() || controller.hasActionSet())
+            if (startTurn == Clock.getRoundNum() || controller.hasActionSet()) {
                 controller.yield();
+            }
         }
     }
 }
