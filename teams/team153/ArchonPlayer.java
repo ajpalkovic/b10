@@ -7,9 +7,9 @@ import java.util.*;
 
 public class ArchonPlayer extends NovaPlayer {
 
-    public int[] verticalDeltas = new int[]{-6, 0, -5, 3, -4, 4, -3, 5, -2, 5, -1, 5, 0, 6, 1, 5, 2, 5, 3, 5, 4, 4, 5, 3, 6, 0};
-    public int[] horizontalDeltas = new int[]{0, -6, 3, -5, 4, -4, 5, -3, 5, -2, 5, -1, 6, 0, 5, 1, 5, 2, 5, 3, 4, 4, 3, 5, 0, 6};
-    public int[] diagonalDeltas = new int[]{5, -3, 5, -2, 5, 0, 6, 0, 5, 1, 5, 2, 5, 3, 4, 3, 4, 4, 3, 4, 3, 5, 2, 5, 1, 5, 0, 5, 0, 6};
+    public int[] verticalDeltas = new int[] {-6, 0, -5, 3, -4, 4, -3, 5, -2, 5, -1, 5, 0, 6, 1, 5, 2, 5, 3, 5, 4, 4, 5, 3, 6, 0};
+    public int[] horizontalDeltas = new int[] {0, -6, 3, -5, 4, -4, 5, -3, 5, -2, 5, -1, 6, 0, 5, 1, 5, 2, 5, 3, 4, 4, 3, 5, 0, 6};
+    public int[] diagonalDeltas = new int[] {5, -3, 5, -2, 5, 0, 6, 0, 5, 1, 5, 2, 5, 3, 4, 3, 4, 4, 3, 4, 3, 5, 2, 5, 1, 5, 0, 5, 0, 6};
     public int archonNumber = 0;
     public int archonGroup = -1;
     public Party scoutParty = new Party(3);
@@ -24,23 +24,23 @@ public class ArchonPlayer extends NovaPlayer {
 
     public void run() {
         boot();
-        while (true) {
+        while(true) {
             int startTurn = Clock.getRoundNum();
             messaging.parseMessages();
             energon.processEnergonTransferRequests();
 
             // reevaluate goal here?
-            switch (currentGoal) {
+            switch(currentGoal) {
                 case Goal.followingArchon:
                     messaging.sendMessageForEnemyRobots();
-                    for (Robot r : controller.senseNearbyAirRobots()) {
-                        if (r.getID() == followingArchonNumber) {
+                    for(Robot r : controller.senseNearbyAirRobots()) {
+                        if(r.getID() == followingArchonNumber) {
                             try {
                                 MapData loc = map.getNotNull(controller.senseRobotInfo(r).location);
                                 navigation.goByBugging(loc);
 
 
-                            } catch (Exception e) {
+                            } catch(Exception e) {
                                 p("----------------cannot sense robot info in following archon");
                             }
                         }
@@ -55,7 +55,7 @@ public class ArchonPlayer extends NovaPlayer {
                     break;
                 case Goal.goingDirectlyToFlux:
                     navigation.goByBugging(spottedFlux);
-                    if (!updateFluxGoal(controller.getLocation())) {
+                    if(!updateFluxGoal(controller.getLocation())) {
                         spawnParty();
                         setGoal(Goal.scouting);
                     }
@@ -82,7 +82,7 @@ public class ArchonPlayer extends NovaPlayer {
                     trackingCount++;
                     trackingCount %= 10;
                     scoutParty.partyUp();
-                    if (trackingCount == 0) {
+                    if(trackingCount == 0) {
                         explore();
                     }
                     scout();
@@ -93,7 +93,7 @@ public class ArchonPlayer extends NovaPlayer {
                     break;
             }
 
-            if (startTurn == Clock.getRoundNum() || controller.hasActionSet()) {
+            if(startTurn == Clock.getRoundNum() || controller.hasActionSet()) {
                 controller.yield();
             }
         }
@@ -105,17 +105,17 @@ public class ArchonPlayer extends NovaPlayer {
 
     public void goTowardsFlux() {
         Direction dir = controller.senseDirectionToUnownedFluxDeposit();
-        if (!controller.canMove(dir)) {
+        if(!controller.canMove(dir)) {
             Direction leftTemp = dir, rightTemp = dir;
-            for (int c = 0; c < 4; c++) {
+            for(int c = 0; c < 4; c++) {
                 leftTemp = leftTemp.rotateLeft();
-                if (controller.canMove(leftTemp)) {
+                if(controller.canMove(leftTemp)) {
                     dir = leftTemp;
                     break;
                 }
 
                 rightTemp = rightTemp.rotateRight();
-                if (controller.canMove(rightTemp)) {
+                if(controller.canMove(rightTemp)) {
                     dir = rightTemp;
                     break;
                 }
@@ -128,12 +128,12 @@ public class ArchonPlayer extends NovaPlayer {
         team = controller.getTeam();
         senseArchonNumber();
         sensing.senseAllTiles();
-        if (archonNumber < 3) {
+        if(archonNumber < 3) {
             setGoal(Goal.goingTowardsFlux);
             archonGroup = 1;
             sensing.senseAllTiles();
 
-        } else if (archonNumber < 5) {
+        } else if(archonNumber < 5) {
             setGoal(Goal.exploringForFlux);
             archonGroup = 2;
             exploreDirection = controller.senseDirectionToUnownedFluxDeposit().rotateLeft();
@@ -142,8 +142,8 @@ public class ArchonPlayer extends NovaPlayer {
             archonGroup = 2;
             exploreDirection = controller.senseDirectionToUnownedFluxDeposit().rotateRight();
         }
-        if (archonNumber % 2 == 0) {
-                //message to other archon
+        if(archonNumber % 2 == 0) {
+            //message to other archon
         }
 
     }
@@ -154,27 +154,27 @@ public class ArchonPlayer extends NovaPlayer {
 
     public void spawnParty() {
         int turnsToWait = new Random().nextInt(8) + Clock.getRoundNum() + 1;
-        while (Clock.getRoundNum() < turnsToWait) {
+        while(Clock.getRoundNum() < turnsToWait) {
             messaging.parseMessages();
             energon.processEnergonTransferRequests();
             controller.yield();
         }
 
-        if (spawning.canSupportUnit(RobotType.CANNON) && scoutParty.partySize < 2) {
+        if(spawning.canSupportUnit(RobotType.CANNON) && scoutParty.partySize < 2) {
             scoutParty.waitForNewUnit(RobotType.CANNON);
             spawning.spawnRobot(RobotType.CANNON);
-        } else if (controller.getEnergonLevel() / controller.getMaxEnergonLevel() > .5) {
+        } else if(controller.getEnergonLevel() / controller.getMaxEnergonLevel() > .5) {
             ArrayList<MapLocation> enemies = sensing.senseEnemyRobotLocations();
-            if (enemies.size() <= 3) {
+            if(enemies.size() <= 3) {
                 goDirection(controller.getLocation().directionTo(enemies.get(0)));
             }
-            if (enemies.size() == 0) {
+            if(enemies.size() == 0) {
                 setGoal(Goal.scouting);
                 explore();
             }
         } else {
             ArrayList<MapLocation> enemies = sensing.senseEnemyRobotLocations();
-            if (enemies.size() > 0) {
+            if(enemies.size() > 0) {
                 goDirection(controller.getLocation().directionTo(enemies.get(0)).opposite());
             }
 
@@ -183,22 +183,22 @@ public class ArchonPlayer extends NovaPlayer {
 
     public void newUnit(int robotID, MapLocation location, String robotType) {
 
-        if (scoutParty.isWaitingForNewRobot() && scoutParty.expectedRobotType.toString().equals(robotType)) {
+        if(scoutParty.isWaitingForNewRobot() && scoutParty.expectedRobotType.toString().equals(robotType)) {
             ArrayList<Robot> nearbyRobots = new ArrayList<Robot>();
             nearbyRobots.addAll(Arrays.asList(controller.senseNearbyAirRobots()));
             nearbyRobots.addAll(Arrays.asList(controller.senseNearbyGroundRobots()));
-            for (Robot r : nearbyRobots) {
-                if (r.getID() == robotID) {
+            for(Robot r : nearbyRobots) {
+                if(r.getID() == robotID) {
                     //this guy is near us, and he is probably the one we were waiting for in our party
                     try {
                         scoutParty.addPartyMember(r, controller.senseRobotInfo(r));
-                    } catch (Exception e) {
+                    } catch(Exception e) {
                         p("------------Cannot Sense Robot Info in newUnit in ArchonPlayer");
                     }
                 }
             }
         }
-        if (RobotType.valueOf(robotType).equals(RobotType.WORKER) && (currentGoal == Goal.supporttingFluxDeposit || currentGoal == Goal.collectingFlux)) {
+        if(RobotType.valueOf(robotType).equals(RobotType.WORKER) && (currentGoal == Goal.supporttingFluxDeposit || currentGoal == Goal.collectingFlux)) {
             messaging.sendFindBlocks(currentGoal == Goal.supporttingFluxDeposit ? spottedFlux.location : controller.getLocation(), findStepDirection(), robotID);
         }
 
@@ -213,18 +213,18 @@ public class ArchonPlayer extends NovaPlayer {
         retDirection = Direction.NORTH;
         MapData checkLoc;
         int prevHeight, currHeight;
-        for (int j = 0; j < 4; j++) {
+        for(int j = 0; j < 4; j++) {
             checkLoc = map.getNotNull(fluxDeposit);
             currHeight = checkLoc.height;
-            for (int i = 0; i <= 6; i++) {
+            for(int i = 0; i <= 6; i++) {
                 prevHeight = currHeight;
                 checkLoc = map.getNotNull(checkLoc.toMapLocation().add(retDirection));
                 currHeight = checkLoc.height;
                 prevHeight -= currHeight;
-                if (prevHeight < -2 || prevHeight > 2) {
+                if(prevHeight < -2 || prevHeight > 2) {
                     break;
                 }
-                if (checkLoc.tile != null && checkLoc.tile.getType() == TerrainType.LAND) {
+                if(checkLoc.tile != null && checkLoc.tile.getType() == TerrainType.LAND) {
                     numLocations[j]++;
                 } else {
                     break;
@@ -235,15 +235,15 @@ public class ArchonPlayer extends NovaPlayer {
         }
         int maxIndex = -1, maxNum = -1, currNum;
 
-        for (int i = 0; i < 4; i++) {
-            if ((currNum = numLocations[i]) > maxNum) {
+        for(int i = 0; i < 4; i++) {
+            if((currNum = numLocations[i]) > maxNum) {
                 maxIndex = i;
                 maxNum = currNum;
             }
         }
 
         retDirection = Direction.NORTH;
-        for (int i = 0; i < maxIndex; i++) {
+        for(int i = 0; i < maxIndex; i++) {
             retDirection = retDirection.rotateRight().rotateRight();
         }
 
@@ -253,18 +253,18 @@ public class ArchonPlayer extends NovaPlayer {
     public boolean updateFluxGoal(MapLocation location) {
         MapData updatedData = sensing.senseTile(spottedFlux.toMapLocation());
 
-        if (updatedData.toMapLocation().equals(controller.getLocation())) {
+        if(updatedData.toMapLocation().equals(controller.getLocation())) {
             controller.setIndicatorString(1, "collecting flux");
             scoutParty.setPartyGoal(Goal.supporttingFluxDeposit);
             setGoal(Goal.collectingFlux);
             return true;
         }
 
-        if (updatedData.airRobot == null) {
+        if(updatedData.airRobot == null) {
             return true;
         }
 
-        if (updatedData.airRobotInfo.team != team) {
+        if(updatedData.airRobotInfo.team != team) {
             //uhoh, its the enemy
             setGoal(Goal.scouting);
             return false;
@@ -279,28 +279,28 @@ public class ArchonPlayer extends NovaPlayer {
 
     public void getCloseToFlux() {
 
-        if (true) {
+        if(true) {
             return;
         }
 
-        while (true) {
+        while(true) {
             MapData updatedData = sensing.senseTile(spottedFlux.toMapLocation());
             int distance = Math.abs(updatedData.x - controller.getLocation().getX()) + Math.abs(updatedData.y - controller.getLocation().getY());
             p("Distance to flux: " + distance);
-            if (distance <= 2) {
+            if(distance <= 2) {
                 break;
             }
 
             MapData[] fluxSquares = sensing.senseSurroundingSquares(spottedFlux.toMapLocation());
             MapData goal = null;
             int count = 0, offset = archonNumber % 3;
-            if (fluxSquares == null) {
+            if(fluxSquares == null) {
                 return;
             }
-            for (MapData square : fluxSquares) {
-                if (square.airRobot == null) {
+            for(MapData square : fluxSquares) {
+                if(square.airRobot == null) {
                     goal = square;
-                    if (count >= offset) {
+                    if(count >= offset) {
                         break;
                     }
                     count++;
@@ -316,7 +316,7 @@ public class ArchonPlayer extends NovaPlayer {
     }
 
     public boolean beforeMovementCallback(MapData data) {
-        switch (currentGoal) {
+        switch(currentGoal) {
             case Goal.goingDirectlyToFlux:
                 return updateFluxGoal(data.toMapLocation());
         }
@@ -325,22 +325,22 @@ public class ArchonPlayer extends NovaPlayer {
 
     public boolean fluxDepositInSightCallback(MapData data) {
         p("flux spotted");
-        if (currentGoal == Goal.exploringForFlux || currentGoal == Goal.goingTowardsFlux) {
+        if(currentGoal == Goal.exploringForFlux || currentGoal == Goal.goingTowardsFlux) {
             setGoal(Goal.goingDirectlyToFlux);
             spottedFlux = data;
-        } else if (currentGoal == Goal.scouting) {
+        } else if(currentGoal == Goal.scouting) {
             boolean good = true;
-            for (MapLocation m : controller.senseAlliedArchons()) {
-                if (m.equals(data.location)) {
+            for(MapLocation m : controller.senseAlliedArchons()) {
+                if(m.equals(data.location)) {
                     good = false;
                     break;
                 }
             }
             ArrayList<RobotInfo> enemies;
-            if ((enemies = sensing.senseEnemyRobotInfoInSensorRange()).size() > 0) {
+            if((enemies = sensing.senseEnemyRobotInfoInSensorRange()).size() > 0) {
                 spawnParty();
                 setGoal(Goal.fight);//FIGHT!
-            } else if (good) {
+            } else if(good) {
                 setGoal(Goal.goingDirectlyToFlux);
                 spottedFlux = data;
             }
@@ -353,7 +353,7 @@ public class ArchonPlayer extends NovaPlayer {
      * so archon teams will stay together
      */
     public void followRequest(int archonNumber, int id) {
-        if (archonNumber % 2 == 1 && this.archonNumber == archonNumber + 1) {
+        if(archonNumber % 2 == 1 && this.archonNumber == archonNumber + 1) {
             setGoal(Goal.followingArchon);
             followingArchonNumber = id;
         }
@@ -373,7 +373,7 @@ public class ArchonPlayer extends NovaPlayer {
         return;
         }*/
 
-        if (exploreDirection != null && !controller.canMove(exploreDirection)) {
+        if(exploreDirection != null && !controller.canMove(exploreDirection)) {
             exploreDirection = controller.senseDirectionToUnownedFluxDeposit();
         }
     }
@@ -392,8 +392,8 @@ public class ArchonPlayer extends NovaPlayer {
     public void senseArchonNumber() {
         Message[] messages = controller.getAllMessages();
         int min = 1;
-        for (Message m : messages) {
-            if (m.ints[0] >= min) {
+        for(Message m : messages) {
+            if(m.ints[0] >= min) {
                 min = m.ints[0] + 1;
             }
         }
@@ -401,10 +401,10 @@ public class ArchonPlayer extends NovaPlayer {
         archonNumber = min;
 
         Message m = new Message();
-        m.ints = new int[]{min};
+        m.ints = new int[] {min};
         try {
             controller.broadcast(m);
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("----Caught Exception in senseArchonNumber.  Exception: " + e.toString());
         }
         System.out.println("Number: " + min);
@@ -455,10 +455,10 @@ public class ArchonPlayer extends NovaPlayer {
             ArrayList<Robot> nearbyRobots = new ArrayList<Robot>();
             nearbyRobots.addAll(Arrays.asList(controller.senseNearbyAirRobots()));
             nearbyRobots.addAll(Arrays.asList(controller.senseNearbyGroundRobots()));
-            while (turn < 15 && missingParty.size() > 0) {
-                for (Robot r : partyRobots) {
-                    for (Robot ro : nearbyRobots) {
-                        if (r.getID() == ro.getID()) {
+            while(turn < 15 && missingParty.size() > 0) {
+                for(Robot r : partyRobots) {
+                    for(Robot ro : nearbyRobots) {
+                        if(r.getID() == ro.getID()) {
                             missingParty.remove(r);
                         }
                     }
@@ -469,14 +469,14 @@ public class ArchonPlayer extends NovaPlayer {
         }
 
         public void setPartyGoal(int partyGoal) {
-            if (this.partyGoal == partyGoal) {
+            if(this.partyGoal == partyGoal) {
                 return;
             }
             this.partyGoal = partyGoal;
-            switch (partyGoal) {
+            switch(partyGoal) {
                 case Goal.followingArchon:
                     System.out.println("Group is Following Archon");
-                    for (Robot robot : partyRobots) {
+                    for(Robot robot : partyRobots) {
                         messaging.sendFollowRequest(controller.getLocation(), archonNumber, robot.getID());
                     }
                     break;
@@ -488,12 +488,12 @@ public class ArchonPlayer extends NovaPlayer {
         }
 
         public void addPartyMember(Robot robot, RobotInfo robotInfo) {
-            if (partySize < partyMaxSize) {
+            if(partySize < partyMaxSize) {
                 partyRobots.add(robot);
                 partyRobotInfo.add(robotInfo);
                 partySize++;
             }
-            if (waitingForNewRobot && expectedRobotType == robotInfo.type) {
+            if(waitingForNewRobot && expectedRobotType == robotInfo.type) {
                 waitingForNewRobot = false;
             }
         }

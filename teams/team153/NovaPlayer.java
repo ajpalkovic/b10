@@ -16,12 +16,16 @@ public class NovaPlayer extends Base {
     public int trackingCount = 0;
     public int currentGoal = 0;
     public int followingArchonNumber = -1;
+
     public Messaging messaging;
     public Navigation navigation;
     public SensationalSensing sensing;
     public EnergeticEnergon energon;
+
     public Team team;
+
     public boolean isAirRobot;
+    public boolean isArchon, isWorker, isScout, isCannon, isSoldier, isChanneler;
 
     public NovaPlayer(RobotController controller) {
         super(controller);
@@ -39,12 +43,43 @@ public class NovaPlayer extends Base {
 
         messaging.sensing = sensing;
         navigation.sensing = sensing;
+
+        isArchon = isArchon(controller.getRobotType());
+        isWorker = isWorker(controller.getRobotType());
+        isScout = isScout(controller.getRobotType());
+        isCannon = isCannon(controller.getRobotType());
+        isSoldier = isSoldier(controller.getRobotType());
+        isChanneler = isChanneler(controller.getRobotType());
+    }
+
+    public boolean isArchon(RobotType type) {
+        return type == RobotType.ARCHON;
+    }
+
+    public boolean isWorker(RobotType type) {
+        return type == RobotType.WORKER;
+    }
+
+    public boolean isScout(RobotType type) {
+        return type == RobotType.SCOUT;
+    }
+
+    public boolean isCannon(RobotType type) {
+        return type == RobotType.CANNON;
+    }
+
+    public boolean isSoldier(RobotType type) {
+        return type == RobotType.SOLDIER;
+    }
+
+    public boolean isChanneler(RobotType type) {
+        return type == RobotType.CHANNELER;
     }
 
     public void run() throws Exception {
         team = controller.getTeam();
-        while (true) {
-            if (energon.isEnergonLow()) {
+        while(true) {
+            if(energon.isEnergonLow()) {
                 energon.requestEnergonTransfer();
             }
         }
@@ -67,10 +102,10 @@ public class NovaPlayer extends Base {
     public int calculateMovementDelay(int heightFrom, int heightTo, boolean diagonal) {
         int cost = diagonal ? player.moveDiagonalDelay : player.moveStraightDelay;
         int delta = heightFrom - heightTo;
-        if (Math.abs(delta) <= 1) {
+        if(Math.abs(delta) <= 1) {
             return cost;
         }
-        if (delta > 0) {
+        if(delta > 0) {
             return cost + GameConstants.FALLING_PENALTY_RATE * delta;
         } else {
             return cost + GameConstants.CLIMBING_PENALTY_RATE * delta * delta;
@@ -88,19 +123,19 @@ public class NovaPlayer extends Base {
      * CALLBACKS
      **************************************************************************/
     public void moveMessageCallback(MapLocation location) {
-        if (!controller.getRobotType().isAirborne() && controller.getLocation().equals(location)) {
+        if(!controller.getRobotType().isAirborne() && controller.getLocation().equals(location)) {
             navigation.moveOnce(navigation.getMoveableDirection(Direction.NORTH));
         }
     }
 
     public void lowEnergonMessageCallback(MapLocation location1, MapLocation location2, int amount, int isAirUnit) {
-        if (location2.equals(controller.getLocation())) {
+        if(location2.equals(controller.getLocation())) {
             energon.addRequest(location1, isAirUnit == 1, amount);
         }
     }
 
     public void lowAlliedUnitMessageCallback() {
-        if (controller.getRobotType() != RobotType.ARCHON) {
+        if(controller.getRobotType() != RobotType.ARCHON) {
             energon.lowAllyRequests.clear();
         }
         energon.lowAllyRequestsTurn = Clock.getRoundNum();
@@ -111,9 +146,9 @@ public class NovaPlayer extends Base {
     }
 
     public void followRequestMessageCallback(MapLocation location, int i, int senderID, int recipientID) {
-        if (controller.getRobotType() == RobotType.ARCHON) {
+        if(controller.getRobotType() == RobotType.ARCHON) {
             followRequest(i, senderID);
-        } else if (recipientID == robot.getID() && currentGoal != Goal.followingArchon) {
+        } else if(recipientID == robot.getID() && currentGoal != Goal.followingArchon) {
             setGoal(Goal.followingArchon);
             navigation.go(new MapData(location));
             followingArchonNumber = senderID;

@@ -19,13 +19,13 @@ public abstract class AttackPlayer extends NovaPlayer {
     }
 
     public boolean directionCalculatedCallback(Direction dir) {
-        if (!movingToAttack) {
+        if(!movingToAttack) {
             return true;
         }
         MapLocation location = controller.getLocation().add(dir);
         MapLocation[] archons = controller.senseAlliedArchons();
-        for (MapLocation archon : archons) {
-            if (location.isAdjacentTo(archon) || location.equals(archon)) {
+        for(MapLocation archon : archons) {
+            if(location.isAdjacentTo(archon) || location.equals(archon)) {
                 return true;
             }
         }
@@ -37,18 +37,18 @@ public abstract class AttackPlayer extends NovaPlayer {
         enemies = new ArrayList<EnemyInfo>();
 
         ArrayList<RobotInfo> enemiesInfo = sensing.senseEnemyRobotInfoInSensorRange();
-        for (RobotInfo enemy : enemiesInfo) {
+        for(RobotInfo enemy : enemiesInfo) {
             enemies.add(new EnemyInfo(enemy));
         }
         messaging.parseMessages();
 
-        if (enemies.size() > 0) {
+        if(enemies.size() > 0) {
             // new enemies were found in range, lets use that info
             enemiesTemp = null;
             noEnemiesCount = 0;
         } else {
             // no new enemy info was received, so stick with the old stuff
-            if (noEnemiesCount < 10) {
+            if(noEnemiesCount < 10) {
                 enemies = enemiesTemp;
                 noEnemiesCount++;
             } else {
@@ -60,7 +60,7 @@ public abstract class AttackPlayer extends NovaPlayer {
     }
 
     public void returnToStartingLocation() {
-        if (controller.getLocation().equals(startingLocation)) {
+        if(controller.getLocation().equals(startingLocation)) {
             startingLocation = null;
             return;
         }
@@ -70,7 +70,7 @@ public abstract class AttackPlayer extends NovaPlayer {
 
     public void moveToAttack() {
         movingToAttack = true;
-        if (outOfRangeEnemies.size() > 0) {
+        if(outOfRangeEnemies.size() > 0) {
             navigation.moveOnceTowardsLocation(getCheapestEnemy(outOfRangeEnemies).location);
         } else {
             navigation.moveOnceTowardsLocation(getCheapestEnemy(outOfRangeArchonEnemies).location);
@@ -86,16 +86,16 @@ public abstract class AttackPlayer extends NovaPlayer {
 
         int range = controller.getRobotType().attackRadiusMaxSquared(), minRange = controller.getRobotType().attackRadiusMinSquared();
 
-        for (int c = 0; c < enemies.size(); c++) {
+        for(int c = 0; c < enemies.size(); c++) {
             EnemyInfo current = enemies.get(c);
 
-            if (current.type == RobotType.ARCHON) {
-                if (current.distance <= range && current.distance >= minRange) {
+            if(current.type == RobotType.ARCHON) {
+                if(current.distance <= range && current.distance >= minRange) {
                     archonEnemies.add(current);
                 } else {
                     outOfRangeArchonEnemies.add(current);
                 }
-            } else if (current.distance > range || current.distance < minRange) {
+            } else if(current.distance > range || current.distance < minRange) {
                 outOfRangeEnemies.add(current);
             } else {
                 inRangeEnemies.add(current);
@@ -104,16 +104,16 @@ public abstract class AttackPlayer extends NovaPlayer {
     }
 
     public EnemyInfo selectEnemy() {
-        if (enemies.size() == 0) {
+        if(enemies.size() == 0) {
             return null;
         }
 
-        if (inRangeEnemies.size() > 0) {
+        if(inRangeEnemies.size() > 0) {
             return getCheapestEnemy(inRangeEnemies);
         } else {
             // if an enemy is just 1 or 2 hops a way, kill him but still come back
-            if (outOfRangeEnemies.size() == 0) {
-                if (archonEnemies.size() > 0) {
+            if(outOfRangeEnemies.size() == 0) {
+                if(archonEnemies.size() > 0) {
                     return getCheapestEnemy(archonEnemies);
                 }
             }
@@ -123,19 +123,19 @@ public abstract class AttackPlayer extends NovaPlayer {
 
     public EnemyInfo getCheapestEnemy(ArrayList<EnemyInfo> enemyList) {
         EnemyInfo min = enemyList.get(0);
-        for (int c = 1; c < enemyList.size(); c++) {
+        for(int c = 1; c < enemyList.size(); c++) {
             EnemyInfo current = enemyList.get(c);
-            if (controller.canSenseSquare(current.location)) {
+            if(controller.canSenseSquare(current.location)) {
                 try {
-                    if ((current.type.isAirborne() && controller.senseAirRobotAtLocation(current.location) == null) ||
+                    if((current.type.isAirborne() && controller.senseAirRobotAtLocation(current.location) == null) ||
                             (!current.type.isAirborne() && controller.senseGroundRobotAtLocation(current.location) == null)) {
                         continue;
                     }
-                } catch (Exception e) {
+                } catch(Exception e) {
                     System.out.println("----Caught Exception in getCheapestEnemy Exception: " + e.toString());
                 }
             }
-            if (current.value < min.value) {
+            if(current.value < min.value) {
                 min = current;
             }
         }
@@ -182,26 +182,26 @@ public abstract class AttackPlayer extends NovaPlayer {
      * moving to make a quick attack or as part of a larger attack strategy.
      */
     public int executeAttack(MapLocation location, RobotLevel level) {
-        if (controller.hasActionSet()) {
+        if(controller.hasActionSet()) {
             return Status.turnsNotIdle;
         }
 
-        if (controller.getRoundsUntilAttackIdle() != 0) {
+        if(controller.getRoundsUntilAttackIdle() != 0) {
             return Status.turnsNotIdle;
         }
 
-        if (!controller.canAttackSquare(location)) {
+        if(!controller.canAttackSquare(location)) {
             return Status.outOfRange;
         }
 
         try {
-            if (level == RobotLevel.ON_GROUND && controller.canAttackGround()) {
+            if(level == RobotLevel.ON_GROUND && controller.canAttackGround()) {
                 controller.attackGround(location);
-            } else if (level == RobotLevel.IN_AIR && controller.canAttackAir()) {
+            } else if(level == RobotLevel.IN_AIR && controller.canAttackAir()) {
                 controller.attackAir(location);
             }
             controller.yield();
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("----Caught exception in executeAttack with location: " + location.toString() + " level: " + level.toString() + " Exception: " + e.toString());
             return Status.fail;
         }
@@ -224,12 +224,12 @@ public abstract class AttackPlayer extends NovaPlayer {
         y = enemyLocation.y;
         int maxDistance = type.attackRadiusMaxSquared();
         int minDistance = type.attackRadiusMinSquared();
-        for (int i = x - maxDistance; i <= x + maxDistance; i++) {
-            if (i <= x - minDistance && i >= x + minDistance) {
+        for(int i = x - maxDistance; i <= x + maxDistance; i++) {
+            if(i <= x - minDistance && i >= x + minDistance) {
                 continue;
             } else {
-                for (int j = y - maxDistance; j < y + maxDistance; j++) {
-                    if (j <= y - minDistance && j >= y + minDistance) {
+                for(int j = y - maxDistance; j < y + maxDistance; j++) {
+                    if(j <= y - minDistance && j >= y + minDistance) {
                         ableSpots.add(new MapData(new MapLocation(i, j)));
                     }
                 }

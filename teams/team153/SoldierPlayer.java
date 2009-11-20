@@ -16,13 +16,13 @@ public class SoldierPlayer extends AttackPlayer {
     public void run() {
         team = controller.getTeam();
         messaging.sendNewUnit();
-        while (true) {
+        while(true) {
             int startTurn = Clock.getRoundNum();
             //autoTransferEnergonBetweenUnits();
             controller.setIndicatorString(0, controller.getLocation().toString());
             processEnemies();
             messaging.parseMessages();
-            if (energon.isEnergonLow()) {
+            if(energon.isEnergonLow()) {
                 energon.requestEnergonTransfer();
                 controller.yield();
                 continue;
@@ -30,9 +30,9 @@ public class SoldierPlayer extends AttackPlayer {
 
             sortEnemies();
             EnemyInfo enemy = selectEnemy();
-            if (enemy != null) {
+            if(enemy != null) {
                 // attack
-                if (!controller.canAttackSquare(enemy.location)) {
+                if(!controller.canAttackSquare(enemy.location)) {
                     navigation.faceLocation(enemy.location);
                     processEnemies();
                 }
@@ -40,27 +40,27 @@ public class SoldierPlayer extends AttackPlayer {
                 processEnemies();
                 attackLocation = enemy.location;
             } else {
-                if (outOfRangeEnemies.size() > 0) {
+                if(outOfRangeEnemies.size() > 0) {
                     // only move if we can do it in 1 turn or less
-                    if (controller.getRoundsUntilMovementIdle() < 2) {
+                    if(controller.getRoundsUntilMovementIdle() < 2) {
                         moveToAttack();
                     }
                 } else {
                     MapLocation archon = navigation.findNearestArchon();
-                    if (!controller.getLocation().isAdjacentTo(archon) && controller.getRoundsUntilMovementIdle() < 2) {
+                    if(!controller.getLocation().isAdjacentTo(archon) && controller.getRoundsUntilMovementIdle() < 2) {
                         navigation.moveOnceTowardsLocation(archon);
                     }
                 }
             }
 
-            if (startTurn == Clock.getRoundNum() || controller.hasActionSet()) {
+            if(startTurn == Clock.getRoundNum() || controller.hasActionSet()) {
                 controller.yield();
             }
         }
     }
 
     public MapLocation findBestLocation(MapLocation enemyLocation) {
-        if (true) {
+        if(true) {
             return enemyLocation;
         }
         controller.getLocation();
@@ -73,9 +73,9 @@ public class SoldierPlayer extends AttackPlayer {
         MapLocation returnData = enemyLocation;
         int minDistance = Integer.MAX_VALUE;
         int distance;
-        for (MapData m : locations) {
+        for(MapData m : locations) {
             distance = m.toMapLocation().distanceSquaredTo(m.toMapLocation());
-            if (distance < minDistance) {
+            if(distance < minDistance) {
                 distance = minDistance;
                 returnData = m.toMapLocation();
             }
@@ -86,17 +86,17 @@ public class SoldierPlayer extends AttackPlayer {
     public void returnToArchon() {
         //SENSE ARCHONS, ITERATE TO FIND CLOSEST, GO TO THAT ONE
         MapLocation archons[] = controller.senseAlliedArchons();
-        if (archons != null) {
+        if(archons != null) {
             int minDistance = controller.getLocation().distanceSquaredTo(archons[0]);
             MapLocation closestArchon = archons[0];
-            for (int i = 0; i < archons.length; i++) {
+            for(int i = 0; i < archons.length; i++) {
                 int dist = controller.getLocation().distanceSquaredTo(archons[i]);
-                if (dist < minDistance) {
+                if(dist < minDistance) {
                     minDistance = dist;
                     closestArchon = archons[i];
                 }
             }
-            if (!controller.getLocation().isAdjacentTo(closestArchon)) {
+            if(!controller.getLocation().isAdjacentTo(closestArchon)) {
                 //           if (controller.getLocation().distanceSquaredTo(closestArchon) > ARCHON_DISTANCE) {
                 navigation.goByBugging(new MapData(closestArchon));
                 //                System.out.println("returning");

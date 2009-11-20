@@ -33,19 +33,19 @@ public class Navigation extends Base {
      * Causes the robot to the face the specified direction if necessary.
      */
     public int faceDirection(Direction dir) {
-        if (dir == null) {
+        if(dir == null) {
             return Status.fail;
         }
 
-        if (controller.getDirection().equals(dir)) {
+        if(controller.getDirection().equals(dir)) {
             return Status.success;
         }
 
-        if (dir.equals(Direction.OMNI)) {
+        if(dir.equals(Direction.OMNI)) {
             return Status.success;
         }
 
-        while (controller.hasActionSet() || controller.getRoundsUntilMovementIdle() != 0) {
+        while(controller.hasActionSet() || controller.getRoundsUntilMovementIdle() != 0) {
             controller.yield();
         }
 
@@ -53,7 +53,7 @@ public class Navigation extends Base {
             controller.setDirection(dir);
             controller.yield();
             return Status.success;
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("----Caught Exception in faceDirection with dir: " + dir.toString() + " Exception: " + e.toString());
         }
 
@@ -67,25 +67,25 @@ public class Navigation extends Base {
      */
     public int faceLocation(MapLocation location) {
         Direction newDir = getDirection(new MapData(controller.getLocation()), new MapData(location));
-        if (newDir == null) {
+        if(newDir == null) {
             return Status.fail;
         }
-        if (newDir == controller.getDirection()) {
+        if(newDir == controller.getDirection()) {
             return Status.success;
         }
 
-        if (controller.hasActionSet()) {
+        if(controller.hasActionSet()) {
             controller.yield();
         }
 
-        while (controller.getRoundsUntilMovementIdle() != 0) {
+        while(controller.getRoundsUntilMovementIdle() != 0) {
             controller.yield();
         }
 
         try {
             controller.setDirection(newDir);
             controller.yield();
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("----Caught exception in faceLocation with MapLocation: " + location.toString() + " Exception: " + e.toString());
             return Status.fail;
         }
@@ -102,9 +102,9 @@ public class Navigation extends Base {
         MapLocation min = null;
         int minDistance = Integer.MAX_VALUE;
 
-        for (MapLocation location : locations) {
+        for(MapLocation location : locations) {
             int distance = current.distanceSquaredTo(location);
-            if (distance < minDistance && distance >= 1) {
+            if(distance < minDistance && distance >= 1) {
                 minDistance = distance;
                 min = location;
             }
@@ -139,47 +139,47 @@ public class Navigation extends Base {
         states.add(new PathLocation(start, null, end));
         PathLocation current = null;
 
-        for (int c = 0; c < 100; c++) {
+        for(int c = 0; c < 100; c++) {
             newStates.clear();
             //for the current level, process each of the states by calculating the cost and estimate for each of the 8 surrounding squares
             //p("New Iteration: "+states.size());
             //p("States: "+states.toString());
-            while (!states.isEmpty()) {
+            while(!states.isEmpty()) {
                 current = states.removeFirst();
                 //p("  Current: "+current.toString3());
                 MapData[] squares = map.getForwardSquares(current.location.x, current.location.y, current.xDelta, current.yDelta, current.diagonal);
                 //p("  Squares: "+squares[0].toString()+" "+squares[1].toString()+" "+squares[2].toString());
-                for (MapData square : squares) {
+                for(MapData square : squares) {
                     // ensure this step is not out of bounds
-                    if (checkWalls(square)) {
+                    if(checkWalls(square)) {
                         continue;
                     }
 
                     MapLocation squarel = square.toMapLocation();
                     try {
-                        if (controller.canSenseSquare(squarel)) {
-                            if (player.isAirRobot) {
-                                if (controller.senseAirRobotAtLocation(squarel) != null) {
+                        if(controller.canSenseSquare(squarel)) {
+                            if(player.isAirRobot) {
+                                if(controller.senseAirRobotAtLocation(squarel) != null) {
                                     continue;
                                 }
                             } else {
-                                if (controller.senseGroundRobotAtLocation(squarel) != null) {
+                                if(controller.senseGroundRobotAtLocation(squarel) != null) {
                                     continue;
                                 }
                             }
                         }
-                    } catch (Exception e) {
+                    } catch(Exception e) {
                         System.out.println("----Caught exception in findPath while sense the square. Square: " +
                                 squarel.toString() + " Exception: " + e.toString());
                     }
 
                     // check for the goal state
-                    if (square.equals(end)) {
+                    if(square.equals(end)) {
                         end.pathCost = current.cost + player.calculateMovementDelay(current.height, map.getHeight(end), true);
                         LinkedList<MapData> ret = new LinkedList<MapData>();
                         ret.addFirst(end);
                         // reverse the path pointed to by current.previous and remove the start location
-                        while (current.previous != null) {
+                        while(current.previous != null) {
                             ret.addFirst(current.location);
                             current = current.previous;
                         }
@@ -192,8 +192,8 @@ public class Navigation extends Base {
                     // check if state has already been marked for consideration.  if it has been, but this is cheaper, then still consider it
                     String s = state.toString();
                     Integer prevCost = seenStates.get(s);
-                    if (prevCost != null) {
-                        if (prevCost.compareTo(state.intCost) <= 0) {
+                    if(prevCost != null) {
+                        if(prevCost.compareTo(state.intCost) <= 0) {
                             //p("        rejecting square");
                             continue;
                         } else {
@@ -208,12 +208,12 @@ public class Navigation extends Base {
 
             //newStates contains up to 32 different squares that we haven't yet considered.  choose the 3 cheapest to continue
             //p(newStates.size()+"  "+newStates.toString());
-            for (int count = 0; count < 3 && count < newStates.size(); count++) {
+            for(int count = 0; count < 3 && count < newStates.size(); count++) {
                 int minId = count;
                 PathLocation min = newStates.get(count);
-                for (int d = count + 1; d < newStates.size(); d++) {
+                for(int d = count + 1; d < newStates.size(); d++) {
                     PathLocation test = newStates.get(d);
-                    if (test.total < min.total) {
+                    if(test.total < min.total) {
                         minId = d;
                         min = test;
                     }
@@ -243,31 +243,31 @@ public class Navigation extends Base {
     }
 
     public Direction getDirection(int x, int y) {
-        if (y < 0) {
-            if (x > 0) {
+        if(y < 0) {
+            if(x > 0) {
                 return Direction.NORTH_EAST;
             }
-            if (x == 0) {
+            if(x == 0) {
                 return Direction.NORTH;
             }
-            if (x < 0) {
+            if(x < 0) {
                 return Direction.NORTH_WEST;
             }
-        } else if (y == 0) {
-            if (x > 0) {
+        } else if(y == 0) {
+            if(x > 0) {
                 return Direction.EAST;
             }
-            if (x < 0) {
+            if(x < 0) {
                 return Direction.WEST;
             }
-        } else if (y > 0) {
-            if (x > 0) {
+        } else if(y > 0) {
+            if(x > 0) {
                 return Direction.SOUTH_EAST;
             }
-            if (x == 0) {
+            if(x == 0) {
                 return Direction.SOUTH;
             }
-            if (x < 0) {
+            if(x < 0) {
                 return Direction.SOUTH_WEST;
             }
         }
@@ -278,34 +278,34 @@ public class Navigation extends Base {
      * Returns the change to the location of an object if it moves one tile in the specified direction.
      */
     public int[] getDirectionDelta(Direction direction) {
-        if (direction == Direction.NORTH_WEST) {
-            return new int[]{-1, -1};
+        if(direction == Direction.NORTH_WEST) {
+            return new int[] {-1, -1};
         }
-        if (direction == Direction.NORTH) {
-            return new int[]{0, -1};
+        if(direction == Direction.NORTH) {
+            return new int[] {0, -1};
         }
-        if (direction == Direction.NORTH_EAST) {
-            return new int[]{1, -1};
-        }
-
-        if (direction == Direction.EAST) {
-            return new int[]{1, 0};
-        }
-        if (direction == Direction.WEST) {
-            return new int[]{-1, 0};
+        if(direction == Direction.NORTH_EAST) {
+            return new int[] {1, -1};
         }
 
-        if (direction == Direction.SOUTH_WEST) {
-            return new int[]{-1, 1};
+        if(direction == Direction.EAST) {
+            return new int[] {1, 0};
         }
-        if (direction == Direction.SOUTH) {
-            return new int[]{0, 1};
-        }
-        if (direction == Direction.SOUTH_EAST) {
-            return new int[]{1, 1};
+        if(direction == Direction.WEST) {
+            return new int[] {-1, 0};
         }
 
-        return new int[]{0, 0};
+        if(direction == Direction.SOUTH_WEST) {
+            return new int[] {-1, 1};
+        }
+        if(direction == Direction.SOUTH) {
+            return new int[] {0, 1};
+        }
+        if(direction == Direction.SOUTH_EAST) {
+            return new int[] {1, 1};
+        }
+
+        return new int[] {0, 0};
     }
 
     /**
@@ -331,21 +331,21 @@ public class Navigation extends Base {
      * Returns the first direction that the robot can move in, starting with the given direction.
      */
     public Direction getMoveableDirection(Direction dir) {
-        if (dir == null) {
+        if(dir == null) {
             return null;
         }
         Direction leftDir = dir, rightDir = dir;
-        if (controller.canMove(dir)) {
+        if(controller.canMove(dir)) {
             return dir;
         } else {
-            for (int d = 0; d < 3; d++) {
+            for(int d = 0; d < 3; d++) {
                 leftDir = leftDir.rotateLeft();
                 rightDir = rightDir.rotateRight();
 
-                if (controller.canMove(leftDir)) {
+                if(controller.canMove(leftDir)) {
                     return leftDir;
                 }
-                if (controller.canMove(rightDir)) {
+                if(controller.canMove(rightDir)) {
                     return rightDir;
                 }
             }
@@ -355,36 +355,36 @@ public class Navigation extends Base {
 
     public Direction getMoveableWorkerDirection(Direction dir) {
         p("in get moveable worker direction");
-        if (dir == null) {
+        if(dir == null) {
             return null;
         }
         boolean messageSent = false;
         int pauseTurns = 5;
         do {
-            if (controller.canMove(dir)) {
+            if(controller.canMove(dir)) {
                 return dir;
             }
-            if (controller.canMove(dir.rotateLeft())) {
+            if(controller.canMove(dir.rotateLeft())) {
                 return dir.rotateLeft();
             }
-            if (controller.canMove(dir.rotateRight())) {
+            if(controller.canMove(dir.rotateRight())) {
                 return dir.rotateRight();
             }
-            if (controller.canMove(dir.rotateRight().rotateRight())) {
+            if(controller.canMove(dir.rotateRight().rotateRight())) {
                 return dir.rotateRight().rotateRight();
             }
-            if (controller.canMove(dir.rotateLeft().rotateLeft())) {
+            if(controller.canMove(dir.rotateLeft().rotateLeft())) {
                 return dir.rotateLeft().rotateLeft();
             }
 
-            if (!messageSent) {
+            if(!messageSent) {
                 p("sending message");
                 messageSent = true;
                 messaging.sendMove(controller.getLocation().add(dir));
             }
             pauseTurns--;
             controller.yield();
-        } while (pauseTurns >= 0);
+        } while(pauseTurns >= 0);
 
         p("returning getMoveableDirection");
         return getMoveableDirection(dir);
@@ -405,7 +405,7 @@ public class Navigation extends Base {
         ret[0] = map.getNotNull(start.add(cur));
         ret[7] = map.getNotNull(start.subtract(cur));
 
-        for (int c = 1; c < 7; c++) {
+        for(int c = 1; c < 7; c++) {
             left = cur.rotateLeft();
             right = cur.rotateRight();
             ret[c] = map.getNotNull(start.add(right));
@@ -421,8 +421,8 @@ public class Navigation extends Base {
         int pauseCount = 5;
         do {
             try {
-                if (controller.canSenseSquare(location) && controller.senseGroundRobotAtLocation(location) != null) {
-                    if (!messageSent) {
+                if(controller.canSenseSquare(location) && controller.senseGroundRobotAtLocation(location) != null) {
+                    if(!messageSent) {
                         messaging.sendMove(location);
                         messageSent = true;
                     }
@@ -430,10 +430,10 @@ public class Navigation extends Base {
                 } else {
                     break;
                 }
-            } catch (Exception e) {
+            } catch(Exception e) {
             }
             pauseCount--;
-        } while (pauseCount >= 0);
+        } while(pauseCount >= 0);
     }
 
     public int goByBugging(MapData end) {
@@ -442,48 +442,48 @@ public class Navigation extends Base {
         int count = 0;
         int oppositeCount = 0;
         controller.setIndicatorString(2, "Goal: " + end.toMapLocation().toString());
-        for (int c = 0; c < 100; c++) {
+        for(int c = 0; c < 100; c++) {
             controller.setIndicatorString(0, "Loc: " + controller.getLocation().toString());
             previous = map.getNotNull(controller.getLocation());
-            if (controller.getLocation().equals(end.toMapLocation())) {
+            if(controller.getLocation().equals(end.toMapLocation())) {
                 return Status.success;
             }
 
             yieldMoving();
             faceLocation(end.toMapLocation());
 
-            if (controller.getLocation().isAdjacentTo(end.toMapLocation())) {
-                if (!controller.canMove(getDirection(controller.getLocation(), end.toMapLocation()))) {
+            if(controller.getLocation().isAdjacentTo(end.toMapLocation())) {
+                if(!controller.canMove(getDirection(controller.getLocation(), end.toMapLocation()))) {
                     try {
-                        if (controller.canSenseSquare(end.toMapLocation()) && (controller.senseGroundRobotAtLocation(end.toMapLocation()) != null)) {
+                        if(controller.canSenseSquare(end.toMapLocation()) && (controller.senseGroundRobotAtLocation(end.toMapLocation()) != null)) {
                             checkBlockedUnitsAndWait(end.toMapLocation());
                         } else {
                             // no one is blocking us but we can't go there, let's fail
                             return Status.fail;
                         }
-                    } catch (Exception e) {
+                    } catch(Exception e) {
                     }
                 }
             }
 
             previous = map.getNotNull(controller.getLocation());
-            if (controller.getRobotType().equals(RobotType.WORKER)) {
+            if(player.isWorker) {
                 dir = getMoveableWorkerDirection(getDirection(previous, end));
             } else {
                 dir = getMoveableDirection(getDirection(previous, end));
             }
 
-            if (dir == null) {
+            if(dir == null) {
                 System.out.println("null direction");
                 controller.yield();
                 continue;
             }
 
             Direction opposite = dir.opposite();
-            if (opposite.equals(previousDir) || opposite.rotateLeft().equals(previousDir) || opposite.rotateRight().equals(previousDir)) {
+            if(opposite.equals(previousDir) || opposite.rotateLeft().equals(previousDir) || opposite.rotateRight().equals(previousDir)) {
                 p("not gonna go that way");
                 oppositeCount++;
-                if (oppositeCount > 5) {
+                if(oppositeCount > 5) {
                     return Status.fail;
                 }
                 controller.yield();
@@ -491,7 +491,7 @@ public class Navigation extends Base {
             }
             oppositeCount = 0;
 
-            if (faceDirection(dir) != Status.success) {
+            if(faceDirection(dir) != Status.success) {
                 p("couldnt face that way");
                 controller.yield();
                 continue;
@@ -503,14 +503,14 @@ public class Navigation extends Base {
 
             try {
                 boolean good = false;
-                for (int d = 0; d < 2; d++) {
-                    if (controller.canMove(dir)) {
-                        if (!player.beforeMovementCallback(map.getNotNull(controller.getLocation().add(dir)))) {
+                for(int d = 0; d < 2; d++) {
+                    if(controller.canMove(dir)) {
+                        if(!player.beforeMovementCallback(map.getNotNull(controller.getLocation().add(dir)))) {
                             return Status.success;
                         }
                         controller.moveForward();
                         controller.yield();
-                        if (!player.pathStepTakenCallback()) {
+                        if(!player.pathStepTakenCallback()) {
                             return Status.success;
                         }
                         good = true;
@@ -520,14 +520,14 @@ public class Navigation extends Base {
                     p("yielding");
                     controller.yield();
                 }
-                if (!good) {
+                if(!good) {
                     count++;
-                    if (count >= 3) {
+                    if(count >= 3) {
                         return Status.cantMoveThere;
                     }
                 }
 
-            } catch (Exception e) {
+            } catch(Exception e) {
                 System.out.println("----Caught Exception in go dir: " + dir.toString() + " Exception: " + e.toString());
             }
         }
@@ -554,7 +554,7 @@ public class Navigation extends Base {
     }
 
     public int go(MapData end, int depth) {
-        if (depth > 5) {
+        if(depth > 5) {
             return Status.fail;
         }
 
@@ -562,27 +562,27 @@ public class Navigation extends Base {
         //p("get path");
         LinkedList<MapData> path = findPath(previous, end);
         //p("got path");
-        if (path == null) {
+        if(path == null) {
             return Status.fail;
         }
 
-        if (!player.pathCalculatedCallback(path)) {
+        if(!player.pathCalculatedCallback(path)) {
             return Status.success;
         }
 
         //System.out.println(controller.getRobot().getID()+": "+previous.toString()+"   "+end.toString()+"   "+path.toString());
         Direction dir = controller.getDirection();
-        while (!path.isEmpty()) {
+        while(!path.isEmpty()) {
             yieldMoving();
 
             MapData step = path.removeFirst();
-            if (controller.canSenseSquare(step.toMapLocation())) {
+            if(controller.canSenseSquare(step.toMapLocation())) {
                 MapData updatedStep = sensing.senseTile(step.toMapLocation());
                 step = updatedStep;
 
-                if ((player.isAirRobot && step.airRobot != null) || (!player.isAirRobot && step.groundRobot != null)) {
+                if((player.isAirRobot && step.airRobot != null) || (!player.isAirRobot && step.groundRobot != null)) {
                     // the path is blocked
-                    if (path.isEmpty()) {
+                    if(path.isEmpty()) {
                         // the goal is blocked
                         return Status.goalBlocked;
                     }
@@ -594,28 +594,28 @@ public class Navigation extends Base {
             faceDirection(newDirection);
 
             //check if the square is free
-            if (!controller.canMove(dir)) {
+            if(!controller.canMove(dir)) {
                 //uhoh, we can't move here, prolly cuz a robot is in the way, time to plot a path around?
                 //check if the square right next to the obstacle is free
                 //just plot a path around and recursively call go?
                 return go(end, depth + 1);
             } else {
                 try {
-                    if (!player.beforeMovementCallback(step)) {
+                    if(!player.beforeMovementCallback(step)) {
                         return Status.success;
                     }
 
-                    if (controller.hasActionSet()) {
+                    if(controller.hasActionSet()) {
                         controller.yield();
                     }
 
                     controller.moveForward();
                     controller.yield();
-                } catch (Exception e) {
+                } catch(Exception e) {
                     System.out.println("----Caught exception in go while moving forward. Exception: " + e.toString());
                     return Status.fail;
                 }
-                if (!player.pathStepTakenCallback()) {
+                if(!player.pathStepTakenCallback()) {
                     return Status.success;
                 }
 
@@ -632,20 +632,20 @@ public class Navigation extends Base {
      */
     public boolean isLocationFree(MapLocation location, boolean isAirUnit) {
         try {
-            if (checkWalls(location)) {
+            if(checkWalls(location)) {
                 return false;
             }
 
-            if (!controller.senseTerrainTile(location).isTraversableAtHeight((isAirUnit ? RobotLevel.IN_AIR : RobotLevel.ON_GROUND))) {
+            if(!controller.senseTerrainTile(location).isTraversableAtHeight((isAirUnit ? RobotLevel.IN_AIR : RobotLevel.ON_GROUND))) {
                 return false;
             }
 
-            if (isAirUnit) {
+            if(isAirUnit) {
                 return controller.senseAirRobotAtLocation(location) == null;
             } else {
                 return controller.senseGroundRobotAtLocation(location) == null;
             }
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("----Caught Exception in isLocationFree location: " + location.toString() + " isAirUnit: " +
                     isAirUnit + " Exception: " + e.toString());
             return false;
@@ -656,15 +656,15 @@ public class Navigation extends Base {
      * Moves the robot one step forward if possible.
      */
     public int moveOnce(Direction dir) {
-        if (faceDirection(dir) != Status.success) {
+        if(faceDirection(dir) != Status.success) {
             return Status.fail;
         }
 
         yieldMoving();
 
         try {
-            for (int c = 0; c < 2; c++) {
-                if (controller.canMove(dir)) {
+            for(int c = 0; c < 2; c++) {
+                if(controller.canMove(dir)) {
                     player.beforeMovementCallback(map.get(controller.getLocation().add(dir)));
                     controller.moveForward();
                     controller.yield();
@@ -675,7 +675,7 @@ public class Navigation extends Base {
             }
             return Status.cantMoveThere;
 
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("----Caught Exception in moveOnce dir: " + dir.toString() + " Exception: " + e.toString());
         }
         return Status.fail;
@@ -685,10 +685,10 @@ public class Navigation extends Base {
         Direction dir = getDirection(controller.getLocation(), location);
         dir = getMoveableDirection(dir);
 
-        if (dir == null) {
+        if(dir == null) {
             return Status.fail;
         }
-        if (!player.directionCalculatedCallback(dir)) {
+        if(!player.directionCalculatedCallback(dir)) {
             return Status.success;
         }
 
@@ -698,7 +698,7 @@ public class Navigation extends Base {
     public void yieldMoving() {
         String cur = Goal.toString(player.currentGoal);
         controller.setIndicatorString(1, "yielding");
-        while (controller.hasActionSet() || controller.getRoundsUntilMovementIdle() != 0) {
+        while(controller.hasActionSet() || controller.getRoundsUntilMovementIdle() != 0) {
             controller.yield();
         }
         controller.setIndicatorString(1, cur);
@@ -716,14 +716,14 @@ public class Navigation extends Base {
             this.location = location;
             this.previous = previous;
             height = map.getHeight(location);
-            if (previous != null) {
+            if(previous != null) {
                 //non diagonal squares will have an x or y coordinate which is the same in both the current location and the next one
                 diagonal = !(location.x == previous.location.x || location.y == previous.location.y);
                 xDelta = location.x - previous.location.x;
                 yDelta = location.y - previous.location.y;
                 cost = player.calculateMovementDelay(height, previous.height, diagonal) + previous.cost;
                 //if we have to change direction
-                if (xDelta != previous.xDelta || yDelta != previous.yDelta) {
+                if(xDelta != previous.xDelta || yDelta != previous.yDelta) {
                     cost++;
                 }
             } else {

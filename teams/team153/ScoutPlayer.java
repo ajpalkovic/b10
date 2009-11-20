@@ -6,9 +6,9 @@ import java.util.*;
 
 public class ScoutPlayer extends AttackPlayer {
 
-    public int[] verticalDeltas = new int[]{-6, 0, -5, 3, -4, 4, -3, 5, -2, 5, -1, 5, 0, 6, 1, 5, 2, 5, 3, 5, 4, 4, 5, 3, 6, 0};
-    public int[] horizontalDeltas = new int[]{0, -6, 3, -5, 4, -4, 5, -3, 5, -2, 5, -1, 6, 0, 5, 1, 5, 2, 5, 3, 4, 4, 3, 5, 0, 6};
-    public int[] diagonalDeltas = new int[]{5, -3, 5, -2, 5, 0, 6, 0, 5, 1, 5, 2, 5, 3, 4, 3, 4, 4, 3, 4, 3, 5, 2, 5, 1, 5, 0, 5, 0, 6};
+    public int[] verticalDeltas = new int[] {-6, 0, -5, 3, -4, 4, -3, 5, -2, 5, -1, 5, 0, 6, 1, 5, 2, 5, 3, 5, 4, 4, 5, 3, 6, 0};
+    public int[] horizontalDeltas = new int[] {0, -6, 3, -5, 4, -4, 5, -3, 5, -2, 5, -1, 6, 0, 5, 1, 5, 2, 5, 3, 4, 4, 3, 5, 0, 6};
+    public int[] diagonalDeltas = new int[] {5, -3, 5, -2, 5, 0, 6, 0, 5, 1, 5, 2, 5, 3, 4, 3, 4, 4, 3, 4, 3, 5, 2, 5, 1, 5, 0, 5, 0, 6};
 
     public ScoutPlayer(RobotController controller) {
         super(controller);
@@ -19,16 +19,16 @@ public class ScoutPlayer extends AttackPlayer {
 
     public void run() {
         boot();
-        while (true) {
+        while(true) {
             int startTurn = Clock.getRoundNum();
             messaging.parseMessages();
-            if (energon.isEnergonLow()) {
+            if(energon.isEnergonLow()) {
                 energon.requestEnergonTransfer();
             } else {
                 energon.autoTransferEnergonBetweenUnits();
             }
 
-            switch (currentGoal) {
+            switch(currentGoal) {
                 case Goal.alliedUnitRelay:
                     sendLowAlliedUnits();
                     break;
@@ -36,7 +36,7 @@ public class ScoutPlayer extends AttackPlayer {
                     break;
             }
 
-            if (startTurn == Clock.getRoundNum() || controller.hasActionSet()) {
+            if(startTurn == Clock.getRoundNum() || controller.hasActionSet()) {
                 controller.yield();
             }
         }
@@ -51,7 +51,7 @@ public class ScoutPlayer extends AttackPlayer {
         ArrayList<RobotInfo> robots = sensing.robotCache.getGroundRobotInfo();
         ArrayList<RobotInfo> lowRobots = new ArrayList<RobotInfo>();
 
-        for (RobotInfo robot : robots) {
+        for(RobotInfo robot : robots) {
             //if(isEnergonLow(robot))
             lowRobots.add(robot);
         }
@@ -64,7 +64,7 @@ public class ScoutPlayer extends AttackPlayer {
         ints[2] = lowRobots.size();
 
         int c = 3, d = 0;
-        for (RobotInfo robot : lowRobots) {
+        for(RobotInfo robot : lowRobots) {
             ints[c] = (int) robot.energonLevel;
             ints[c + 1] = (int) robot.energonReserve;
             ints[c + 2] = (int) robot.maxEnergon;

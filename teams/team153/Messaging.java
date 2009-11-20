@@ -27,29 +27,29 @@ public class Messaging extends Base {
         message.ints[2] = robot.getID();
         boolean good = true;
 
-        for (int i = 3; i < messageInts.size() + 3; i++) {
+        for(int i = 3; i < messageInts.size() + 3; i++) {
             message.ints[i] = messageInts.get(i - 3);
         }
 
         message.locations = new MapLocation[messageLocations.size()];
-        for (int i = 0; i < message.locations.length; i++) {
+        for(int i = 0; i < message.locations.length; i++) {
             message.locations[i] = messageLocations.get(i);
         }
 
         message.strings = new String[messageStrings.size()];
-        for (int i = 0; i < message.strings.length; i++) {
+        for(int i = 0; i < message.strings.length; i++) {
             message.strings[i] = messageStrings.get(i);
         }
 
         try {
-            if (controller.hasBroadcastMessage()) {
+            if(controller.hasBroadcastMessage()) {
                 controller.clearBroadcast();
             }
 
             controller.broadcast(message);
 
             good = true;
-        } catch (Exception e) {
+        } catch(Exception e) {
             e.printStackTrace();
             p("----Caught Exception in sendMessage.  message: " + message.toString() + " Exception: " + e.toString());
             good = false;
@@ -59,13 +59,13 @@ public class Messaging extends Base {
 
     public void parseMessages() {
         Message[] messages = controller.getAllMessages();
-        for (Message message : messages) {
+        for(Message message : messages) {
             processMessage(message);
         }
     }
 
     public void processMessage(Message message) {
-        if (message != null) {
+        if(message != null) {
 
             //We got a message!
             /*String out = "";
@@ -74,7 +74,7 @@ public class Messaging extends Base {
             p("Message Received: "+out);*/
 
             //is it ours?
-            if (message.ints == null || message.ints.length < 3 || message.ints[0] != KEY1 || message.ints[1] != KEY2) {
+            if(message.ints == null || message.ints.length < 3 || message.ints[0] != KEY1 || message.ints[1] != KEY2) {
                 return;
             }
 
@@ -85,11 +85,11 @@ public class Messaging extends Base {
             int stringIndex = 0;
             int messageID = -1, recipientID = -1;
 
-            for (int i = 3; i < message.ints.length; i += getMessageLength(messageID)) {
+            for(int i = 3; i < message.ints.length; i += getMessageLength(messageID)) {
                 messageID = message.ints[i];
                 //System.out.println(messageID);
                 recipientID = message.ints[i + 1];
-                switch (messageID) {
+                switch(messageID) {
                     case BroadcastMessage.UNDER_ATTACK:
                         ;//someone is under attack!!!!
                         break;
@@ -111,16 +111,16 @@ public class Messaging extends Base {
                         player.newUnit(senderID, message.locations[0], message.strings[0]);//theres a new unit! I should send my map info!
                         break;
                     case BroadcastMessage.SCOUT_ALLIED_UNIT_RELAY:
-                        if (controller.getRobotType() == RobotType.SCOUT) {
+                        if(player.isScout) {
                             player.setGoal(Goal.alliedUnitRelay);
                         }
                         break;
                     case BroadcastMessage.LOW_ALLIED_UNITS:
                         int count = message.ints[i + 2];
                         int index = i + 3;
-                        if (controller.getRobotType() != RobotType.ARCHON) {
+                        if(player.isArchon) {
                             player.lowAlliedUnitMessageCallback();
-                            for (int c = 0; c < count; c++) {
+                            for(int c = 0; c < count; c++) {
                                 MapLocation location = message.locations[locationIndex];
                                 int level = message.ints[index];
                                 int reserve = message.ints[index + 1];
@@ -142,9 +142,9 @@ public class Messaging extends Base {
                         break;
                     case BroadcastMessage.FIND_BLOCKS:
                         locationIndex++;
-                        if (message.ints[i + 1] == controller.getRobot().getID()) {
+                        if(message.ints[i + 1] == controller.getRobot().getID()) {
                             Direction dir = Direction.NONE;
-                            switch (message.ints[i + 2]) {
+                            switch(message.ints[i + 2]) {
                                 case 0:
                                     dir = Direction.NORTH;
                                     break;
@@ -168,16 +168,16 @@ public class Messaging extends Base {
 
                         break;
                     case BroadcastMessage.PONG:
-                        for (int j = 2; i < message.ints.length; i++) {
-                            switch (message.ints[i]) {
+                        for(int j = 2; i < message.ints.length; i++) {
+                            switch(message.ints[i]) {
                                 case BroadcastMessage.ENEMY_IN_SIGHT:
-                                    ;//this unit has seen an enemy in the past 100 turns
+                                    //this unit has seen an enemy in the past 100 turns
                                     break;
                                 case BroadcastMessage.FLUX_IN_SIGHT:
-                                    ;//this unit can see flux
+                                    //this unit can see flux
                                     break;
                                 case BroadcastMessage.UNDER_ATTACK:
-                                    ;//this unit has been recently attacked
+                                    //this unit has been recently attacked
                                     break;
                             }
                         }
@@ -187,7 +187,7 @@ public class Messaging extends Base {
                     case BroadcastMessage.FOLLOW_REQUEST:
                         player.followRequestMessageCallback(message.locations[locationIndex], message.ints[i + 2], senderID, recipientID);
 
-                        if (controller.getRobotType() != RobotType.ARCHON && recipientID == robot.getID() && player.currentGoal != Goal.followingArchon) {
+                        if(player.isArchon && recipientID == robot.getID() && player.currentGoal != Goal.followingArchon) {
                             locationIndex++;
                         }
 
@@ -217,7 +217,7 @@ public class Messaging extends Base {
      *  
      **********************************************/
     public int getMessageLength(int messageID) {
-        switch (messageID) {
+        switch(messageID) {
             case BroadcastMessage.ENEMY_IN_SIGHT:
                 return 3;
             case BroadcastMessage.FLUX_IN_SIGHT:
@@ -249,7 +249,7 @@ public class Messaging extends Base {
         //int id;
         //RobotInfo info;
         //MapLocation oldLocation;
-        for (RobotInfo robot : enemies) {
+        for(RobotInfo robot : enemies) {
             int[] data = {(int) robot.energonLevel, -1};
             String robotType = robot.type.toString();
 
@@ -286,30 +286,30 @@ public class Messaging extends Base {
             }
             }*/
         }
-        if (enemies.size() > 0) {
+        if(enemies.size() > 0) {
             sendMessage();
             player.enemyInSight(enemies);
         }
     }
 
     public boolean addMessage(int[] ints, String[] strings, MapLocation[] locations) {
-        if (!controller.hasBroadcastMessage()) {
+        if(!controller.hasBroadcastMessage()) {
             clearMessages();
         }
 
         int i = 0;
-        if (ints != null) {
-            for (i = 0; i < ints.length; i++) {
+        if(ints != null) {
+            for(i = 0; i < ints.length; i++) {
                 messageInts.add(ints[i]);
             }
         }
-        if (strings != null) {
-            for (i = 0; strings != null && i < strings.length; i++) {
+        if(strings != null) {
+            for(i = 0; strings != null && i < strings.length; i++) {
                 messageStrings.add(strings[i]);
             }
         }
-        if (locations != null) {
-            for (i = 0; i < locations.length; i++) {
+        if(locations != null) {
+            for(i = 0; i < locations.length; i++) {
                 messageLocations.add(locations[i]);
             }
         }
@@ -328,7 +328,7 @@ public class Messaging extends Base {
     }
 
     public boolean sendScoutAlliedUnitRelay() {
-        return addMessage(new int[]{BroadcastMessage.SCOUT_ALLIED_UNIT_RELAY, -1}, null, null);
+        return addMessage(new int[] {BroadcastMessage.SCOUT_ALLIED_UNIT_RELAY, -1}, null, null);
     }
 
     public boolean sendFluxInSight(MapLocation location) {
@@ -357,7 +357,7 @@ public class Messaging extends Base {
         ints[0] = BroadcastMessage.LOW_ENERGON;
         ints[1] = -1;
         ints[2] = amount;
-        ints[3] = controller.getRobotType().isAirborne() ? 1 : 0;
+        ints[3] = player.isAirRobot ? 1 : 0;
 
         MapLocation[] locations = new MapLocation[2];
         locations[0] = controller.getLocation();

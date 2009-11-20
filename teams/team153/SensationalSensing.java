@@ -29,10 +29,10 @@ public class SensationalSensing extends Base {
         int currentX = controller.getLocation().getX();
         int currentY = controller.getLocation().getY();
 
-        for (int x = -radius; x <= radius; x++) {
-            for (int y = -radius; y <= radius; y++) {
+        for(int x = -radius; x <= radius; x++) {
+            for(int y = -radius; y <= radius; y++) {
                 MapLocation location = new MapLocation(x + currentX, y + currentY);
-                if (controller.canSenseSquare(location)) {
+                if(controller.canSenseSquare(location)) {
                     tiles[x + radius][y + radius] = location;
                 } else {
                     tiles[x + radius][y + radius] = null;
@@ -45,12 +45,12 @@ public class SensationalSensing extends Base {
 
     public boolean runSensorCallbacks(MapData data) {
         boolean ret = true;
-        if (data != null) {
+        if(data != null) {
             ret = player.tileSensedCallback(data);
-            if (data.airRobot != null || data.groundRobot != null) {
+            if(data.airRobot != null || data.groundRobot != null) {
                 ret = player.enemyInSightCallback(data) && ret;
             }
-            if (data.deposit != null) {
+            if(data.deposit != null) {
                 ret = player.fluxDepositInSightCallback(data) && ret;
             }
         }
@@ -63,8 +63,8 @@ public class SensationalSensing extends Base {
     public boolean canSenseEnemy(MapLocation enemyLocation) {
         ArrayList<MapLocation> locations = senseEnemyRobotLocations();
         System.out.println("Can sense enemy!");
-        for (MapLocation l : locations) {
-            if (l.getX() == enemyLocation.getX() && l.getX() == enemyLocation.getY()) {
+        for(MapLocation l : locations) {
+            if(l.getX() == enemyLocation.getX() && l.getX() == enemyLocation.getY()) {
                 return true;
             }
         }
@@ -97,11 +97,11 @@ public class SensationalSensing extends Base {
         int xDelta, yDelta, x, y;
         int[] deltas;
 
-        if (directionDelta[0] == 0) {
+        if(directionDelta[0] == 0) {
             xDelta = 1;
             yDelta = directionDelta[1];
             deltas = verticalDeltas;
-        } else if (directionDelta[1] == 0) {
+        } else if(directionDelta[1] == 0) {
             xDelta = directionDelta[0];
             yDelta = 1;
             deltas = horizontalDeltas;
@@ -111,7 +111,7 @@ public class SensationalSensing extends Base {
             deltas = diagonalDeltas;
         }
 
-        for (int c = 0; c < deltas.length; c += 2) {
+        for(int c = 0; c < deltas.length; c += 2) {
             x = currentX + deltas[c] * xDelta;
             y = currentY + deltas[c + 1] * yDelta;
             runSensorCallbacks(senseTile(new MapLocation(x, y)));
@@ -122,14 +122,14 @@ public class SensationalSensing extends Base {
         ArrayList<RobotInfo> ret = new ArrayList<RobotInfo>();
         ArrayList<RobotInfo> ground = robotCache.getGroundRobotInfo(), air = robotCache.getAirRobotInfo();
 
-        for (RobotInfo robot : ground) {
-            if (!robot.team.equals(player.team)) {
+        for(RobotInfo robot : ground) {
+            if(!robot.team.equals(player.team)) {
                 ret.add(robot);
             }
         }
 
-        for (RobotInfo robot : air) {
-            if (!robot.team.equals(player.team)) {
+        for(RobotInfo robot : air) {
+            if(!robot.team.equals(player.team)) {
                 ret.add(robot);
             }
         }
@@ -141,7 +141,7 @@ public class SensationalSensing extends Base {
         ArrayList<RobotInfo> enemyRobots = senseEnemyRobotInfoInSensorRange();
         ArrayList<MapLocation> returnList;
         returnList = new ArrayList<MapLocation>();
-        for (RobotInfo r : enemyRobots) {
+        for(RobotInfo r : enemyRobots) {
             returnList.add(r.location);
         }
         return returnList;
@@ -181,18 +181,18 @@ public class SensationalSensing extends Base {
     public MapData senseTile(MapLocation location) {
         TerrainTile tile = null;
 
-        if (!controller.canSenseSquare(location)) {
+        if(!controller.canSenseSquare(location)) {
             return null;
         }
 
         try {
             tile = controller.senseTerrainTile(location);
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("----Caught exception in senseTile1 tile: " + location.toString() + " Exception: " + e.toString());
         }
 
         // if the tile is off map, we do not want to store it in the database, cuz it will cause problems
-        if (tile == null || tile.getType() == TerrainTile.TerrainType.OFF_MAP) {
+        if(tile == null || tile.getType() == TerrainTile.TerrainType.OFF_MAP) {
             MapData data = new MapData(location);
             data.tile = tile;
             updateWalls(data);
@@ -203,7 +203,7 @@ public class SensationalSensing extends Base {
         try {
             MapData data = map.getOrCreate(location.getX(), location.getY());
 
-            if (data.lastUpdate >= Clock.getRoundNum()) {
+            if(data.lastUpdate >= Clock.getRoundNum()) {
                 return data;
             }
 
@@ -212,7 +212,7 @@ public class SensationalSensing extends Base {
             int blockHeight = controller.senseNumBlocksAtLocation(location);
 
             data.tile = tile;
-            if (terrainHeight != data.terrainHeight || blockHeight != data.blockHeight) {
+            if(terrainHeight != data.terrainHeight || blockHeight != data.blockHeight) {
                 //the block has changed so update the heights and wall locations
                 data.terrainHeight = terrainHeight;
                 data.blockHeight = blockHeight;
@@ -222,9 +222,9 @@ public class SensationalSensing extends Base {
             data.airRobot = controller.senseAirRobotAtLocation(location);
             data.groundRobot = controller.senseGroundRobotAtLocation(location);
 
-            if (!data.isFluxDeposit) {
+            if(!data.isFluxDeposit) {
                 data.deposit = controller.senseFluxDepositAtLocation(location);
-                if (data.deposit != null) {
+                if(data.deposit != null) {
                     data.isFluxDeposit = true;
                 }
             }
@@ -233,23 +233,23 @@ public class SensationalSensing extends Base {
             data.groundRobotInfo = null;
             data.depositInfo = null;
 
-            if (data.airRobot != null) {
+            if(data.airRobot != null) {
                 data.airRobotInfo = controller.senseRobotInfo(data.airRobot);
             }
-            if (data.groundRobot != null) {
+            if(data.groundRobot != null) {
                 data.groundRobotInfo = controller.senseRobotInfo(data.groundRobot);
             }
-            if (data.isFluxDeposit) {
+            if(data.isFluxDeposit) {
                 data.depositInfo = controller.senseFluxDepositInfo(data.deposit);
             }
 
-            if (updateWalls) {
+            if(updateWalls) {
                 updateWalls(data);
             }
 
             data.lastUpdate = Clock.getRoundNum();
             return data;
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("----Caught exception in senseTile2 tile: " + location.toString() + " Exception: " + e.toString());
         }
         return null;
@@ -260,10 +260,10 @@ public class SensationalSensing extends Base {
      * function tileSensedCallback for each of the resulting MapData objects.
      */
     public void senseTiles(MapLocation[][] tiles) {
-        for (MapLocation[] row : tiles) {
-            for (MapLocation tile : row) {
-                if (tile != null) {
-                    if (!runSensorCallbacks(senseTile(tile))) {
+        for(MapLocation[] row : tiles) {
+            for(MapLocation tile : row) {
+                if(tile != null) {
+                    if(!runSensorCallbacks(senseTile(tile))) {
                         return;
                     }
                 }
@@ -285,47 +285,47 @@ public class SensationalSensing extends Base {
      * right of it.
      */
     public void updateWalls(MapData data) {
-        if (data.tile == null) {
+        if(data.tile == null) {
             return;
         }
 
-        if (data.tile.getType() == TerrainTile.TerrainType.OFF_MAP) {
-            if (data.x > player.rightWallBounds && data.x < player.rightWall) {
+        if(data.tile.getType() == TerrainTile.TerrainType.OFF_MAP) {
+            if(data.x > player.rightWallBounds && data.x < player.rightWall) {
                 player.rightWall = data.x;
             }
-            if (data.x < player.leftWallBounds && data.x > player.leftWall) {
+            if(data.x < player.leftWallBounds && data.x > player.leftWall) {
                 player.leftWall = data.x;
             }
 
-            if (data.y < player.topWallBounds && data.y > player.topWall) {
+            if(data.y < player.topWallBounds && data.y > player.topWall) {
                 player.topWall = data.y;
             }
-            if (data.y > player.bottomWallBounds && data.y < player.bottomWall) {
+            if(data.y > player.bottomWallBounds && data.y < player.bottomWall) {
                 player.bottomWall = data.y;
             }
-        } else if (data.tile.getType() == TerrainTile.TerrainType.LAND) {
-            if (data.x > player.rightWallBounds) {
+        } else if(data.tile.getType() == TerrainTile.TerrainType.LAND) {
+            if(data.x > player.rightWallBounds) {
                 player.rightWallBounds = data.x;
-                if (player.rightWall <= player.rightWallBounds) {
+                if(player.rightWall <= player.rightWallBounds) {
                     player.rightWall = player.rightWallBounds + 1;
                 }
             }
-            if (data.x < player.leftWallBounds) {
+            if(data.x < player.leftWallBounds) {
                 player.leftWallBounds = data.x;
-                if (player.leftWall >= player.leftWallBounds) {
+                if(player.leftWall >= player.leftWallBounds) {
                     player.leftWall = player.leftWallBounds - 1;
                 }
             }
 
-            if (data.y > player.bottomWallBounds) {
+            if(data.y > player.bottomWallBounds) {
                 player.bottomWallBounds = data.y;
-                if (player.bottomWall <= player.bottomWallBounds) {
+                if(player.bottomWall <= player.bottomWallBounds) {
                     player.bottomWall = player.bottomWallBounds + 1;
                 }
             }
-            if (data.y < player.topWallBounds) {
+            if(data.y < player.topWallBounds) {
                 player.topWallBounds = data.y;
-                if (player.topWall >= player.topWallBounds) {
+                if(player.topWall >= player.topWallBounds) {
                     player.topWall = player.topWallBounds - 1;
                 }
             }
@@ -344,46 +344,46 @@ public class SensationalSensing extends Base {
         }
 
         public Robot[] getAirRobots() {
-            if (airSensed >= Clock.getRoundNum() - oldDataTolerance) {
+            if(airSensed >= Clock.getRoundNum() - oldDataTolerance) {
                 return air;
             }
 
             try {
                 air = controller.senseNearbyAirRobots();
                 airSensed = Clock.getRoundNum();
-            } catch (Exception e) {
+            } catch(Exception e) {
                 System.out.println("----Caught Exception in getAirRobots.  Exception: " + e.toString());
             }
             return air;
         }
 
         public Robot[] getGroundRobots() {
-            if (groundSensed >= Clock.getRoundNum() - oldDataTolerance) {
+            if(groundSensed >= Clock.getRoundNum() - oldDataTolerance) {
                 return ground;
             }
 
             try {
                 ground = controller.senseNearbyGroundRobots();
                 groundSensed = Clock.getRoundNum();
-            } catch (Exception e) {
+            } catch(Exception e) {
                 System.out.println("----Caught Exception in getGroundRobots.  Exception: " + e.toString());
             }
             return ground;
         }
 
         public ArrayList<RobotInfo> getAirRobotInfo() {
-            if (airInfoSensed >= Clock.getRoundNum() - oldDataTolerance) {
+            if(airInfoSensed >= Clock.getRoundNum() - oldDataTolerance) {
                 return airInfo;
             }
 
             getAirRobots();
             airInfo = new ArrayList<RobotInfo>();
-            for (Robot robot : air) {
+            for(Robot robot : air) {
                 try {
-                    if (controller.canSenseObject(robot)) {
+                    if(controller.canSenseObject(robot)) {
                         airInfo.add(controller.senseRobotInfo(robot));
                     }
-                } catch (Exception e) {
+                } catch(Exception e) {
                     System.out.println("----Caught Exception in getAirRobotInfo.  Exception: " + e.toString());
                 }
             }
@@ -392,18 +392,18 @@ public class SensationalSensing extends Base {
         }
 
         public ArrayList<RobotInfo> getGroundRobotInfo() {
-            if (groundInfoSensed >= Clock.getRoundNum() - oldDataTolerance) {
+            if(groundInfoSensed >= Clock.getRoundNum() - oldDataTolerance) {
                 return groundInfo;
             }
 
             getGroundRobots();
             groundInfo = new ArrayList<RobotInfo>();
-            for (Robot robot : ground) {
+            for(Robot robot : ground) {
                 try {
-                    if (controller.canSenseObject(robot)) {
+                    if(controller.canSenseObject(robot)) {
                         groundInfo.add(controller.senseRobotInfo(robot));
                     }
-                } catch (Exception e) {
+                } catch(Exception e) {
                     System.out.println("----Caught Exception in getGroundRobotInfo.  Exception: " + e.toString());
                 }
             }

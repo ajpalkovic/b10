@@ -6,9 +6,9 @@ import java.util.*;
 
 public class WorkerPlayer extends NovaPlayer {
 
-    public int[] verticalDeltas = new int[]{-4, 0, -3, 2, -2, 3, -1, 3, 0, 4, 1, 3, 2, 3, 3, 2, 4, 0};
-    public int[] horizontalDeltas = new int[]{0, -4, 2, -3, 3, -2, 3, -1, 4, 0, 3, 1, 3, 2, 2, 3, 0, 4};
-    public int[] diagonalDeltas = new int[]{3, -2, 3, 0, 4, 0, 3, 1, 3, 2, 2, 2, 2, 3, 1, 3, 0, 3, 0, 4};
+    public int[] verticalDeltas = new int[] {-4, 0, -3, 2, -2, 3, -1, 3, 0, 4, 1, 3, 2, 3, 3, 2, 4, 0};
+    public int[] horizontalDeltas = new int[] {0, -4, 2, -3, 3, -2, 3, -1, 4, 0, 3, 1, 3, 2, 2, 3, 0, 4};
+    public int[] diagonalDeltas = new int[] {3, -2, 3, 0, 4, 0, 3, 1, 3, 2, 2, 2, 2, 3, 1, 3, 0, 3, 0, 4};
     public int exploreDistance = 5;
     public int status;
     ArrayList<MapData> steps;
@@ -27,13 +27,13 @@ public class WorkerPlayer extends NovaPlayer {
         messaging.sendNewUnit();
         setGoal(Goal.idle);
 
-        while (true) {
+        while(true) {
             int startTurn = Clock.getRoundNum();
             energon.autoTransferEnergonBetweenUnits();
 
             messaging.parseMessages();
 
-            switch (currentGoal) {
+            switch(currentGoal) {
                 case Goal.findBlock:
                     findBlockGoal();
                     break;
@@ -45,7 +45,7 @@ public class WorkerPlayer extends NovaPlayer {
                     break;
             }
 
-            if (startTurn == Clock.getRoundNum() || controller.hasActionSet()) {
+            if(startTurn == Clock.getRoundNum() || controller.hasActionSet()) {
                 controller.yield();
             }
         }
@@ -53,8 +53,8 @@ public class WorkerPlayer extends NovaPlayer {
 
     public void findBlockGoal() {
         blockLocation = findBlock();
-        if (blockLocation != null) {
-            if (getNumBlocksInCargo() == 0) {
+        if(blockLocation != null) {
+            if(getNumBlocksInCargo() == 0) {
                 setGoal(Goal.foundBlock);
                 //p("setting found block goal");
             }
@@ -66,14 +66,14 @@ public class WorkerPlayer extends NovaPlayer {
     public int getNumBlocksInCargo() {
         try {
             return controller.senseNumBlocksInCargo(controller.getRobot());
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("caught exception in findBlockGoal " + e.toString());
         }
         return 0;
     }
 
     public void foundBlockGoal() {
-        if (getNumBlocksInCargo() > 0) {
+        if(getNumBlocksInCargo() > 0) {
             setGoal(Goal.goingToSteps);
             return;
         }
@@ -81,7 +81,7 @@ public class WorkerPlayer extends NovaPlayer {
         gotoBlock();
 
         try {
-            if (controller.canLoadBlockFromLocation(blockLocation.toMapLocation())) {
+            if(controller.canLoadBlockFromLocation(blockLocation.toMapLocation())) {
                 controller.loadBlockFromLocation(blockLocation.toMapLocation());
                 lastBlockLocation = blockLocation;
                 //p("loaded block");
@@ -92,7 +92,7 @@ public class WorkerPlayer extends NovaPlayer {
                 //p("coudl not load block");
                 setGoal(Goal.findBlock);
             }
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("Caught exception in foundBlockGoal " + e.toString());
             setGoal(Goal.goingToSteps);
         }
@@ -115,17 +115,17 @@ public class WorkerPlayer extends NovaPlayer {
 
     public void checkBlockingUnit(MapLocation location) {
         try {
-            if (controller.senseGroundRobotAtLocation(location) != null) {
+            if(controller.senseGroundRobotAtLocation(location) != null) {
                 messaging.sendMove(location);
             }
-        } catch (Exception e) {
+        } catch(Exception e) {
             System.out.println("Caught Exception in checkBlockingUnit: " + e.toString());
         }
     }
 
     public void gotoGoal() {
         Direction dir = navigation.getDirection(controller.getLocation(), fluxLocation.toMapLocation());
-        if (dir != null) {
+        if(dir != null) {
             MapData goal = map.getOrCreate(fluxLocation.toMapLocation().subtract(dir));
             navigation.goByBugging(goal);
         }
@@ -135,7 +135,7 @@ public class WorkerPlayer extends NovaPlayer {
         do {
             //p("getting info");
             int[] goalInformation = findGoalLocation();
-            if (goalInformation == null) {
+            if(goalInformation == null) {
                 return;
             }
             currentStep = goalInformation[1];
@@ -154,25 +154,25 @@ public class WorkerPlayer extends NovaPlayer {
             status = navigation.goByBugging(goalLocation);
             //p("status"+status);
 
-            if (status == Status.fail) {
+            if(status == Status.fail) {
                 //p("----gonna retry");
             } else {
                 keepGoing = false;
             }
 
             goalLocation = steps.get(goalInformation[0]);
-        } while (keepGoing);
+        } while(keepGoing);
 
         // now i am at the base of the steps
-        while (true) {
+        while(true) {
             //p("Goal Location: "+goalLocation.toStringFull());
             //p("My Location: "+controller.getLocation());
-            if (controller.getLocation().isAdjacentTo(goalLocation.toMapLocation()) &&
+            if(controller.getLocation().isAdjacentTo(goalLocation.toMapLocation()) &&
                     goalLocation.height - map.get(controller.getLocation()).height <= 1) {
                 navigation.faceLocation(goalLocation.toMapLocation());
                 break;
             }
-            if (currentStep <= 1) {
+            if(currentStep <= 1) {
                 break;
             }
 
@@ -182,15 +182,15 @@ public class WorkerPlayer extends NovaPlayer {
 
             currentStep--;
             MapLocation location = steps.get(currentStep).toMapLocation();
-            for (int c = 0; c < 3; c++) {
+            for(int c = 0; c < 3; c++) {
                 navigation.faceLocation(location);
                 navigation.yieldMoving();
-                if (!controller.canMove(navigation.getDirection(controller.getLocation(), location))) {
+                if(!controller.canMove(navigation.getDirection(controller.getLocation(), location))) {
                     navigation.checkBlockedUnitsAndWait(location);
                 }
                 navigation.moveOnceTowardsLocation(location);
                 navigation.yieldMoving();
-                if (controller.getLocation().equals(location)) {
+                if(controller.getLocation().equals(location)) {
                     break;
                 }
             }
@@ -202,15 +202,15 @@ public class WorkerPlayer extends NovaPlayer {
         try {
             navigation.yieldMoving();
 
-            if (controller.canUnloadBlockToLocation(goalLocation.toMapLocation())) {
+            if(controller.canUnloadBlockToLocation(goalLocation.toMapLocation())) {
                 //p("trying to unload");
                 controller.unloadBlockToLocation(goalLocation.toMapLocation());
                 setGoal(Goal.findBlock);
-            } else if (controller.getLocation().isAdjacentTo(goalLocation.toMapLocation())) {
+            } else if(controller.getLocation().isAdjacentTo(goalLocation.toMapLocation())) {
                 checkBlockingUnit(goalLocation.location);
                 //p("adjacent to steps");
                 // I'm next to the location, but I can't drop it there!
-                if (controller.getLocation().equals(goalLocation.toMapLocation())) {
+                if(controller.getLocation().equals(goalLocation.toMapLocation())) {
                     //p("At location, but cannot drop");
                 }
             } else {
@@ -218,11 +218,11 @@ public class WorkerPlayer extends NovaPlayer {
                 checkBlockingUnit(goalLocation.location);
                 //checkBlockingUnit(currentStepLocation.location);
             }
-            if (status == Status.fail) {
+            if(status == Status.fail) {
                 //p("failed");
             }
 
-        } catch (Exception e) {
+        } catch(Exception e) {
             //could not load block onto location
             //System.out.println("reconfigure!");
         }
@@ -242,7 +242,7 @@ public class WorkerPlayer extends NovaPlayer {
         createSteps();
         this.goalLocation = map.getOrCreate(fluxLocation.add(stepDirection));
         exploreDistance = 5;
-        if (currentGoal == Goal.idle) {
+        if(currentGoal == Goal.idle) {
             setGoal(Goal.findBlock);
         }
     }
@@ -255,21 +255,21 @@ public class WorkerPlayer extends NovaPlayer {
         MapLocation[] nearbyBlocks = controller.senseNearbyBlocks();
         ArrayList<MapLocation> blocks = sortedByDistance(nearbyBlocks);
         stepsLoop:
-        for (MapLocation block : blocks) {
-            for (MapData step : steps) {
-                if (step.toMapLocation().equals(block)) {
+        for(MapLocation block : blocks) {
+            for(MapData step : steps) {
+                if(step.toMapLocation().equals(block)) {
                     continue stepsLoop;
                 }
             }
-            for (MapData step : badBlocks) {
-                if (step.toMapLocation().equals(block)) {
+            for(MapData step : badBlocks) {
+                if(step.toMapLocation().equals(block)) {
                     continue stepsLoop;
                 }
             }
 
             int blockLocationHeight = map.getNotNull(block).height;
             int currentHeight = map.getOrCreate(controller.getLocation()).height;
-            if (currentHeight - blockLocationHeight > 1 || blockLocationHeight - currentHeight > 1) {
+            if(currentHeight - blockLocationHeight > 1 || blockLocationHeight - currentHeight > 1) {
                 continue stepsLoop;
             }
 
@@ -286,10 +286,10 @@ public class WorkerPlayer extends NovaPlayer {
         MapLocation small = null;
 
         MapLocation currLocation = controller.getLocation();
-        while (!spots.isEmpty()) {
+        while(!spots.isEmpty()) {
             smallest = Integer.MAX_VALUE;
-            for (MapLocation m : spots) {
-                if ((currDist = currLocation.distanceSquaredTo(m)) < smallest) {
+            for(MapLocation m : spots) {
+                if((currDist = currLocation.distanceSquaredTo(m)) < smallest) {
                     small = m;
                     smallest = currDist;
                 }
@@ -310,15 +310,15 @@ public class WorkerPlayer extends NovaPlayer {
         int step = getFirstForBlock(0);
         int stepClimbStart = isAccessible(step);
 
-        if (stepClimbStart > -1 && step > -1) {
-            return new int[]{step, stepClimbStart};
+        if(stepClimbStart > -1 && step > -1) {
+            return new int[] {step, stepClimbStart};
         }
         //return new MapData[] {steps.get(step), steps.get(stepClimbStart)};
         return null;
     }
 
     public int isAccessible(int currentStep) {
-        if (currentStep >= 8) {
+        if(currentStep >= 8) {
             return -1;
         }
 
@@ -328,15 +328,15 @@ public class WorkerPlayer extends NovaPlayer {
         int myHeight = map.get(controller.getLocation()).height;
         //p("isAccessible currentStep: "+currentStep+"  me: "+myHeight+"  current: "+current.toStringFull()+"  previous: "+previous.toStringFull());
 
-        if (current.height - myHeight <= 2) {
-            if (currentStep < 8) {
+        if(current.height - myHeight <= 2) {
+            if(currentStep < 8) {
                 return currentStep + 1;
             } else {
                 return currentStep;
             }
         }
 
-        if (current.height - previous.height <= 2) {
+        if(current.height - previous.height <= 2) {
             return isAccessible(currentStep + 1);
         } else {
             return -1;
@@ -344,7 +344,7 @@ public class WorkerPlayer extends NovaPlayer {
     }
 
     public int getFirstForBlock(int currentStep) {
-        if (currentStep >= 8) {
+        if(currentStep >= 8) {
             return currentStep;
         }
 
@@ -353,8 +353,8 @@ public class WorkerPlayer extends NovaPlayer {
 
         //p("getFirstForBlock currentStep: "+currentStep+"  current: "+current.toStringFull()+"  previous: "+previous.toStringFull());
         // i can place a block on current from previous
-        if (current.height - previous.height <= 1) {
-            if (isAccessible(currentStep) > -1) {
+        if(current.height - previous.height <= 1) {
+            if(isAccessible(currentStep) > -1) {
                 return currentStep;
             } else {
                 return getFirstForBlock(currentStep + 1);
@@ -366,35 +366,35 @@ public class WorkerPlayer extends NovaPlayer {
 
     public void searchForBlocks() {
         //need to track movement to make sure explore a big map area
-        if (lastBlockLocation != null && !controller.getLocation().equals(blockLocation) && !controller.getLocation().isAdjacentTo(lastBlockLocation.toMapLocation())) {
+        if(lastBlockLocation != null && !controller.getLocation().equals(blockLocation) && !controller.getLocation().isAdjacentTo(lastBlockLocation.toMapLocation())) {
             searchDirection = controller.getLocation().directionTo(lastBlockLocation.toMapLocation());
         }
 
         checkBlockingUnit(controller.getLocation().add(searchDirection));
 
-        if (controller.canMove(searchDirection)) {
+        if(controller.canMove(searchDirection)) {
             status = navigation.moveOnce(searchDirection);
-            if (status != Status.success || controller.getLocation().distanceSquaredTo(fluxLocation.toMapLocation()) > exploreDistance) {
+            if(status != Status.success || controller.getLocation().distanceSquaredTo(fluxLocation.toMapLocation()) > exploreDistance) {
                 searchDirection = searchDirection.rotateRight();
-                if (searchDirection.equals(stepDirection)) {
+                if(searchDirection.equals(stepDirection)) {
                     exploreDistance *= 3;
                 }
             }
         } else {
             searchDirection = searchDirection.rotateRight();
-            if (searchDirection.equals(stepDirection)) {
+            if(searchDirection.equals(stepDirection)) {
                 exploreDistance *= 3;
             }
         }
     }
 
     public void senseSteps() {
-        for (MapData m : steps) {
+        for(MapData m : steps) {
             try {
-                if (controller.canSenseSquare(m.toMapLocation())) {
+                if(controller.canSenseSquare(m.toMapLocation())) {
                     m.height = controller.senseHeightOfLocation(m.toMapLocation());
                 }
-            } catch (Exception e) {
+            } catch(Exception e) {
                 System.out.println("Caught Exception in senseSteps: " + e.toString());
             }
         }
@@ -414,7 +414,7 @@ public class WorkerPlayer extends NovaPlayer {
         steps.add(tmp);
 
         //go right two, then down two, then left two
-        for (int c = 0; c < 3; c++) {
+        for(int c = 0; c < 3; c++) {
             dir = dir.rotateRight().rotateRight();
             tmp = map.getOrCreate(tmp.toMapLocation().add(dir));
             steps.add(tmp);

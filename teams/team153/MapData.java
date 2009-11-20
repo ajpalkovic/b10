@@ -25,16 +25,16 @@ public class MapData {
         ret += " terrainHeight: " + terrainHeight;
         ret += " blockHeight: " + blockHeight;
         ret += " isFluxDeposit: " + isFluxDeposit;
-        if (deposit != null) {
+        if(deposit != null) {
             ret += " deposit: " + deposit;
         }
-        if (groundRobot != null) {
+        if(groundRobot != null) {
             ret += " groundRobot: " + groundRobot;
         }
-        if (airRobot != null) {
+        if(airRobot != null) {
             ret += " airRobot: " + airRobot;
         }
-        if (tile != null) {
+        if(tile != null) {
             ret += " tile: " + tile;
         }
         ret += " lastUpdate: " + lastUpdate;
@@ -84,7 +84,7 @@ public class MapData {
     }
 
     public MapLocation toMapLocation() {
-        if (location == null) {
+        if(location == null) {
             location = new MapLocation(x, y);
         }
         return location;

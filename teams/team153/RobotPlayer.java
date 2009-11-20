@@ -14,24 +14,24 @@ public class RobotPlayer implements Runnable {
 
     public void run() {
         NovaPlayer player;
-        if (controller.getRobotType().equals(RobotType.ARCHON)) {
+        if(controller.getRobotType().equals(RobotType.ARCHON)) {
             player = new ArchonPlayer(controller);
-        } else if (controller.getRobotType().equals(RobotType.SOLDIER)) {
+        } else if(controller.getRobotType().equals(RobotType.SOLDIER)) {
             player = new SoldierPlayer(controller);
-        } else if (controller.getRobotType().equals(RobotType.SCOUT)) {
+        } else if(controller.getRobotType().equals(RobotType.SCOUT)) {
             player = new ScoutPlayer(controller);
-        } else if (controller.getRobotType().equals(RobotType.CANNON)) {
+        } else if(controller.getRobotType().equals(RobotType.CANNON)) {
             player = new CannonPlayer(controller);
-        } else if (controller.getRobotType().equals(RobotType.CHANNELER)) {
+        } else if(controller.getRobotType().equals(RobotType.CHANNELER)) {
             player = new ChannelerPlayer(controller);
         } else {
             player = new WorkerPlayer(controller);
         }
 
-        while (true) {
+        while(true) {
             try {
                 player.run();
-            } catch (Exception e) {
+            } catch(Exception e) {
                 e.printStackTrace();
             }
         }

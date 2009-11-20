@@ -22,11 +22,11 @@ public class Base {
     }
 
     public void p(String s) {
-        if (false) {
+        if(false) {
             return;
         }
 
-        if (controller.getRobot().getID() == 109) {
+        if(controller.getRobot().getID() == 109) {
             System.out.println(s);
         }
     }
@@ -66,7 +66,7 @@ public class Base {
         public static final int findBlock = 40, foundBlock = 41, goingToSteps = 42;
 
         public static String toString(int goal) {
-            switch (goal) {
+            switch(goal) {
                 case exploringForFlux:
                     return "Exploring for Flux";
                 case goingTowardsFlux:
