@@ -148,13 +148,6 @@ public class SensationalSensing extends Base {
     }
 
     /**
-     * Default method to update the map each time the robot moves.
-     */
-    public void senseNewTiles() {
-        senseAllTiles();
-    }
-
-    /**
      * Sense the 8 tiles around the robot.
      */
     public MapData[] senseSurroundingSquares() {

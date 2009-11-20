@@ -149,7 +149,7 @@ public class ArchonPlayer extends NovaPlayer {
     }
 
     public void enemyInSight() {
-        ;//spawnParty();
+        //spawnParty();
     }
 
     public void spawnParty() {

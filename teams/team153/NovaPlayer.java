@@ -77,6 +77,13 @@ public class NovaPlayer extends Base {
         }
     }
 
+    /**
+     * Default method to update the map each time the robot moves.
+     */
+    public void senseNewTiles() {
+        sensing.senseAllTiles();
+    }
+
     /***************************************************************************
      * CALLBACKS
      **************************************************************************/
@@ -159,7 +166,7 @@ public class NovaPlayer extends Base {
      * If the callback returns false, the go method returns.
      */
     public boolean pathStepTakenCallback() {
-        sensing.senseNewTiles();
+        senseNewTiles();
         return true;
     }
 
