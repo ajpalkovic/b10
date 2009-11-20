@@ -1,0 +1,88 @@
+Archons only get 1 energon per turn
+Changing direction takes one round
+6000 bytecodes per round, and .1 of the leftover is added to energon
+Only move 1 block at a time
+
+Worker:
+	While true:
+		Parse any messages (map data)
+		Find nearest flux desposit we own
+		Find nearest block
+		Compute path to that block
+		If it has enough energon to get there and back: (keep in mind it will get lots of yield bonuses)
+			Go to block
+			Make sure block is still there (can be doing this each step of the way)
+			Load block
+		Return to flux desposit
+		Unload block
+		Get energon
+	Can only load/unload a square that is +/- 2 away
+	Goal should be to get 6 blocks per flux
+		First 2 blocks: 1
+		Third block: 2
+		Fourth block: 2
+		Fifth block: 3
+		Sixth block: 3 GOAL
+		Seventh block: 4
+	Worker might not be able to return to flux deposit cuz it can only climb 2 height w/ a block
+
+Soldiers:
+	Check if enemies are near
+	Check if one of our robots is being attacked
+	Check if it should be defending flux
+	Soldiers should double team enemies
+	Channeler:
+		Have to be guided
+		Can't constantly drain - 0.1 energon loss
+		Do absorb .1 of its attack damage
+		
+Archons:
+	Transmit their location in grid
+	Based on number, go in 6 different directions
+	Transmit new locations
+	When they find a flux deposit, send a message to the other archon
+	Each archon builds a worker, channeler, and scout, fills their energon and gives them all map info
+	Save a reference to those spawned robots?
+	
+	Tell spawned units all their map info
+	Give energon to units who want it
+	Burn flux to double energon production 300 flux for 100 extra energon
+	Spawn workers and soldiers
+	Find an unowned flux deposit
+	Each archon will start at a specific location in a 3x2 square which can give them their initial direction
+	Should stay in radio range of each other
+	Once a flux deposit is found, archon's should search a bit more and then double team it, make scouts to search
+	Make 2 workers and a channeler quickly
+
+Scout:
+	Get map data from all 6 archons
+	Explore map
+	When low on energon, go to nearest archon and refill
+	Go to the other archons and give each of them the map data
+
+Energon transfers:
+	Fill up the robot's energon reserve, and then each turn 1 energon from reserve moves to the main energon level
+
+Messages:
+	Have an 8 tile radius
+	Only broadcast new squares?
+
+Map System:
+	Mod x and y by 60 and return that index
+
+How can soldiers move when the map changes so much
+Relay attack messages to soldier
+	What if the relayer dies
+Some sensor methods seem like they do not need the robot to be in range
+Is attack bonus added to or multiplied to the attack power
+
+Add start to open
+while open not empty:
+current = lowest cost square of open
+if current == goal, done
+else
+move current from open to closed
+for each square s adjacent to current:
+if s is traversable, s not in open, and s not in closed
+compute cost of s
+add s to open

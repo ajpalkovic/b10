@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map height="32" width="32">
+	<game seed="-579572188" rounds="4250" points="15000"/>
+	<symbols>
+		<symbol terrain="LAND" type="TERRAIN" character=" "/>
+		<symbol terrain="VOID" type="TERRAIN" character="#"/>
+		<symbol team="A" type="ARCHON" character="A"/>
+		<symbol team="B" type="ARCHON" character="a"/>
+		<symbol team="A" type="CANNON" character="C"/>
+		<symbol team="B" type="CANNON" character="c"/>
+		<symbol team="A" type="SOLDIER" character="L"/>
+		<symbol team="B" type="SOLDIER" character="l"/>
+		<symbol team="A" type="CHANNELER" character="Z"/>
+		<symbol team="B" type="CHANNELER" character="z"/>
+		<symbol team="A" type="WORKER" character="W"/>
+		<symbol team="B" type="WORKER" character="w"/>
+		<symbol team="A" type="SCOUT" character="S"/>
+		<symbol team="B" type="SCOUT" character="s"/>
+		<symbol team="NEUTRAL" type="DEPOSIT" character="*"/>
+		<symbol team="A" type="DEPOSIT" character="M"/>
+		<symbol team="B" type="DEPOSIT" character="m"/>
+	</symbols>
+	<data>
+<![CDATA[
+		                                
+		 AA                             
+		 AA                             
+		 AA                             
+		     ####              ####     
+		        #              #        
+		        #              #        
+		      * #    ######    # *      
+		        #              #        
+		        #        *     #        
+		     ####              ####     
+		                                
+		                                
+		                                
+		            #      #            
+		            #      #            
+		            #      #            
+		            #      #            
+		                                
+		                                
+		                                
+		     ####              ####     
+		        #     *        #        
+		        #              #        
+		      * #    ######    # *      
+		        #              #        
+		        #              #        
+		     ####              ####     
+		                             aa 
+		                             aa 
+		                             aa 
+		                                
+]]>
+	</data>
+	<height>
+<![CDATA[
+		IIIHGGGGGGHHHEEEEEEHHHGGGGGGHIII
+		IIIHGGGGGGHHHEEEEEEHHHGGGGGGHIII
+		IIIHGGGHHHHHHEEEEEEHHHHHHGGGHIII
+		IIIHGGGHHHHHHEEEEEEHHHHHHGGGHIII
+		HHHHGGGGGIIIIEEEEEEIIIIGGGGGHHHH
+		GGGGGEEEGIIIIEEEEEEIIIIGEEEGGGGG
+		GGGGGEEEGIIIIEEEEEEIIIIGEEEGGGGG
+		GGGFFEEEGIIIJGGGGGGJIIIGEEEFFGGG
+		GGGFFEEEGIIIJKKKKKKJIIIGEEEFFGGG
+		GGGFFEEEGIIIJKKKKKKJIIIGEEEFFGGG
+		GGGFFGGGGIIIJKKKKKKJIIIGGGGFFGGG
+		GGGGGGHHHIIIJKKKKKKJIIIHHHGGGGGG
+		GGGGGGHHHIIIJKKKKKKJIIIHHHGGGGGG
+		GGGGGGHHHIIIJKKKKKKJIIIHHHGGGGGG
+		EEEEEEEEEEEEGEEEEEEGEEEEEEEEEEEE
+		EEEEEEEEEEEEGEEEEEEGEEEEEEEEEEEE
+		EEEEEEEEEEEEGEEEEEEGEEEEEEEEEEEE
+		EEEEEEEEEEEEGEEEEEEGEEEEEEEEEEEE
+		GGGGGGHHHIIIJKKKKKKJIIIHHHGGGGGG
+		GGGGGGHHHIIIJKKKKKKJIIIHHHGGGGGG
+		GGGGGGHHHIIIJKKKKKKJIIIHHHGGGGGG
+		GGGFFGGGGIIIJKKKKKKJIIIGGGGFFGGG
+		GGGFFEEEGIIIJKKKKKKJIIIGEEEFFGGG
+		GGGFFEEEGIIIJKKKKKKJIIIGEEEFFGGG
+		GGGFFEEEGIIIJGGGGGGJIIIGEEEFFGGG
+		GGGGGEEEGIIIIEEEEEEIIIIGEEEGGGGG
+		GGGGGEEEGIIIIEEEEEEIIIIGEEEGGGGG
+		HHHHGGGGGIIIIEEEEEEIIIIGGGGGHHHH
+		IIIHGGGHHHHHHEEEEEEHHHHHHGGGHIII
+		IIIHGGGHHHHHHEEEEEEHHHHHHGGGHIII
+		IIIHGGGGGGHHHEEEEEEHHHGGGGGGHIII
+		IIIHGGGGGGHHHEEEEEEHHHGGGGGGHIII
+]]>
+	</height>
+	<blocks>
+<![CDATA[
+		00000011110000122100001111000000
+		00000011110000011000001111000000
+		00000010000000000000000001000000
+		00000010000001111110000001000000
+		00000000000003211230000000000000
+		00000111000003211230000011100000
+		00000101000003211230000010100000
+		11010101000000000000000010101011
+		01010101000000000000000010101010
+		01010111000000000000000011101010
+		11010000000000000000000000001011
+		00000000000000111100000000000000
+		00000000000000022000000000000000
+		00000000000000011000000000000000
+		00222000000006666660000000022200
+		00222000000000066000000000022200
+		00222000000000066000000000022200
+		00222000000006666660000000022200
+		00000000000000011000000000000000
+		00000000000000022000000000000000
+		00000000000000111100000000000000
+		11010000000000000000000000001011
+		01010111000000000000000011101010
+		01010101000000000000000010101010
+		11010101000000000000000010101011
+		00000101000003211230000010100000
+		00000111000003211230000011100000
+		00000000000003211230000000000000
+		00000010000001111110000001000000
+		00000010000000000000000001000000
+		00000011110000011000001111000000
+		00000011110000122100001111000000
+]]>
+	</blocks>
+</map>

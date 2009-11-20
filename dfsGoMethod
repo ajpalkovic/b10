@@ -1,0 +1,71 @@
+public LinkedList<MapData> findPath(MapData start, MapData end) {
+        p(start.toString()+"  "+end.toString());
+        ArrayList<PathLocation> states = new ArrayList<PathLocation>();
+        ArrayList<PathLocation> newStates = new ArrayList<PathLocation>();
+        Hashtable<String, Integer> seenStates = new Hashtable<String, Integer>();
+        states.add(new PathLocation(start, null, end, 0));
+        PathLocation current = null;
+        int[] levels = new int[200];
+        int cutoff = 3;
+        for(int c = 0; c < levels.length; c++)
+            levels[c] = 0;
+
+        while(!states.isEmpty()) {
+            current = states.remove(states.size()-1);
+            if(levels[current.level] >= cutoff)
+                continue;
+            int level = current.level + 1;
+            if(levels[level] >= cutoff)
+                continue;
+            levels[current.level]++;
+            //p("  Current: "+current.toString3());
+            MapData[] squares = map.getForwardSquares(current.location.x, current.location.y, current.xDelta, current.yDelta, current.diagonal);
+            for(MapData square : squares) {
+                // ensure this step is not out of bounds
+                if(checkWalls(square))
+                    continue;
+
+                // check for the goal state
+                if(square.equals(end)) {
+                    end.pathCost = current.cost + calculateMovementDelay(current.height, map.getHeight(end), true);
+                    LinkedList<MapData> ret = new LinkedList<MapData>();
+                    ret.addFirst(end);
+                    // reverse the path pointed to by current.previous and remove the start location
+                    while(current.previous != null) {
+                        ret.addFirst(current.location);
+                        current = current.previous;
+                    }
+                    return ret;
+                }
+
+                PathLocation state = new PathLocation(square, current, end, level);
+                //p("    New state: "+state.toString2());
+
+                // check if state has already been marked for consideration.  if it has been, but this is cheaper, then still consider it
+                String s = state.toString();
+                Integer prevCost = seenStates.get(s);
+                if(prevCost != null)
+                    if(prevCost.compareTo(state.intCost) <= 0) {
+                        //p("        rejecting square");
+                        continue;
+                    } else {
+                        seenStates.remove(s);
+                        states.remove(state);
+                    }
+                seenStates.put(s, state.intCost);
+
+                boolean notAdded = true;
+                for(int c = states.size()-1; c >= 0; c--)
+                    if(state.total < states.get(c).total) {
+                        states.add(c, state);
+                        notAdded = false;
+                        break;
+                    }
+                if(notAdded)
+                    states.add(0, state);
+            }
+        }
+        //p("returning null");
+        //uhoh, we shouldn't be here WUT ARE WE GONNA DO? (return null)
+        return null;
+    }

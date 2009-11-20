@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir=".." name="Battlecode 2009-IDE">
+    <import file="../build.xml"/>
+    <!-- TODO: edit the following target according to your needs -->
+    <!-- (more info: http://www.netbeans.org/kb/articles/freeform-config.html#debugj2se) -->
+    <target depends="build" name="debug-nb">
+        <nbjpdastart addressproperty="jpda.address" name="Battlecode 2009" transport="dt_socket"/>
+        <java classname="battlecode.main.Main" classpathref="classpath.run" fork="yes">
+            <jvmarg value="-Dapple.awt.graphics.UseQuartz=true"/>
+            <jvmarg value="-Dbc.server.map-path=${path.maps}"/>
+            <jvmarg value="-Xmx256m"/>
+            <env key="LD_LIBRARY_PATH" path="./:${env.LD_LIBRARY_PATH}"/>
+            <arg line="-c bc.conf"/>
+            <jvmarg value="-Xdebug"/>
+            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+        </java>
+    </target>
+</project>

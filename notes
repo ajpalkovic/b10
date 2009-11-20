@@ -1,0 +1,161 @@
+Archons only get 1 energon per turn
+Changing direction takes one round
+6000 bytecodes per round, and .1 of the leftover is added to energon
+Only move 1 block at a time
+  
+  
+Worker:
+	While true:
+		Parse any messages (map data)
+		Find nearest flux desposit we own
+		Find nearest block
+		Compute path to that block
+		If it has enough energon to get there and back: (keep in mind it will get lots of yield bonuses)
+			Go to block
+			Make sure block is still there (can be doing this each step of the way)
+			Load block
+		Return to flux desposit
+		Unload block
+		Get energon
+	Can only load/unload a square that is +/- 2 away
+	Goal should be to get 6 blocks per flux
+		First 2 blocks: 1
+		Third block: 2
+		Fourth block: 2
+		Fifth block: 3
+		Sixth block: 3 GOAL
+		Seventh block: 4
+	Worker might not be able to return to flux deposit cuz it can only climb 2 height w/ a block
+
+Soldiers:
+	Check if enemies are near
+	Check if one of our robots is being attacked
+	Check if it should be defending flux
+	Soldiers should double team enemies
+	Channeler:
+		Have to be guided
+		Can't constantly drain - 0.1 energon loss
+		Do absorb .1 of its attack damage
+		Perform an attack every fourth turn and see if the channeler gains some energy
+		
+Archons:
+	Transmit their location in grid
+	Based on number, go in 6 different directions
+	Transmit new locations
+	When they find a flux deposit, send a message to the other archon
+	Each archon builds a worker, channeler, and scout, fills their energon and gives them all map info
+	Save a reference to those spawned robots?
+	
+	Tell spawned units all their map info
+	Give energon to units who want it
+	Burn flux to double energon production 300 flux for 100 extra energon
+	Spawn workers and soldiers
+	Find an unowned flux deposit
+	Each archon will start at a specific location in a 3x2 square which can give them their initial direction
+	Should stay in radio range of each other
+	Once a flux deposit is found, archon's should search a bit more and then double team it, make scouts to search
+	Make 2 workers and a channeler quickly
+	
+	At beginning:
+		split in 3 groups of two and go in 3 different directions, each team of 2 should stay in radio range
+		code:
+			scan 8 surrounding cells to get position
+			scan all cells to get map data
+			change direction
+			move one cell
+			setup map
+			
+Scout:
+	Get map data from all 6 archons
+	Explore map
+	When low on energon, go to nearest archon and refill
+	Go to the other archons and give each of them the map data
+
+Energon transfers:
+	Fill up the robot's energon reserve, and then each turn 1 energon from reserve moves to the main energon level
+	Deal with multiple energon requests
+
+Messages:
+	Have an 8 tile radius
+	Only broadcast new squares?
+	Types:
+		unit under attack
+		enemy in sight
+		flux deposits
+		sync newly spawned units
+		request energon
+		new map heights
+		sync map
+		ping - request and respond
+	Relay messages
+	Extend MapLocation class
+	Use archons as router - when a robot comes in for energon, the archon should give it all its map data and the robot gives the archon its data
+	Have a scout that travels between archons syncing data
+
+Map System:
+	Mod x and y by 60 and return that index
+
+How can soldiers move when the map changes so much
+Relay attack messages to soldier
+	What if the relayer dies
+Some sensor methods seem like they do not need the robot to be in range
+Is attack bonus added to or multiplied to the attack power
+
+Attacking
+	gang up?
+	unit ratio and count?
+	retreat time?
+	send archons?
+	build up terrain?
+	
+Directions
+	Go method:
+		recalculate path
+		repair path when obstructed
+		canMove method to take care of walls
+		when a wall is discovered, set a map variable indicating modded index and actual index of the wall
+	Path method:
+		use sensors for blocked tiles
+	
+Methods
+	findBlock, loadBlock, unloadBlock
+	sendMessage, relayMessage, processMessage
+	senseNewTiles
+	attackMethods
+	
+Workers
+	have to find / remember stuff
+		need to sense map to find the best location to place this block
+		have a build stairs state / meta info?
+	what if no blocks in range?
+		have boolean for wheter there are more blocks at previous location
+		if none, search in increasing radius
+Archons
+	send 3 archons to go towards thje flux, only 1/4 should capture it
+	if path is obstructed rotate until free
+	form archon group - all archons broadcast id if they want to join
+	select lowest of the ids and join
+	lowest id gets to capture it
+		change for first to arrive at it
+	when captured, spawn
+
+Status Codes: 
+A unit, when pinged can return one or more of these codes - there are status codes and then there are action codes
+A unit might want to be queried, so that if a unit is too far away to update, another unit can ping it when it is back in range
+to find out where it is and its status. We can use these codes for appropriately dealing with situations.
+A random id will be created and broadcast on the first turn.  All subsequent messages must include it to distinguish our messages.
+Syncing map info:
+	Only send the new cells.  When new map tiles are added, they will be timestaped with the current turn (the coordinates of each cell updated will be stored in an array indexed by that time stamp)
+	map info is 3 ints, 2 for the coordinates, and 1 for tile info like terrain height, block height, and contains flux
+
+   so broadcast when status changes or when pinged.
+   broadcast message ints[0] should ALWAYS be the source robot's ID
+   
+   LOW_ENERGON (has less than 25% energon) //status, sent when pinged
+   UNDER_ATTACK (has been attacked in the past 100 turns) (enemy type, enemy energon level) //broadcasted initially, and sent as status when pinged if has been attacked for past 100 turns
+   ENEMY_IN_SIGHT (can see an enemy) //broadcasted  (how many enemies and enemy types)
+   FLUX_IN_SIGHT (can see flux) //broadcasted  (parameter is location)
+   NEW_UNIT (type of unit location on map maybe unique id) //broadcasted
+   MAP_INFO  //broadcasted
+   PING //maybe only archons use this? 
+   
