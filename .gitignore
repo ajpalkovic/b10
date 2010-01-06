@@ -11,6 +11,8 @@ bc.conf
 build.xml
 common-source/*
 doc/*
+doc/*/*
+doc/*/*/*
 gluegen-rt.dll
 idata
 jogl.dll
